@@ -56,3 +56,10 @@ compile_commands.json
 
 client/build/
 server/build/
+_Sample/SqlApp/build/
+_Sample/EchoClientApp/build/
+_Sample/EchoServerApp/build/
+_Sample/miniproject2/build/
+_Sample/ThreadApp/build/
+
+
