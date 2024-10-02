@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+class Thread;
+
 class Widget : public QWidget
 {
     Q_OBJECT
@@ -10,5 +12,11 @@ class Widget : public QWidget
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
+
+private :
+    Thread* thread;
+
+public slots:
+    void threadControl(bool flag);
 };
 #endif // WIDGET_H
