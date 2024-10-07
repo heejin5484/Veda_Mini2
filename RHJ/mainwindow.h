@@ -24,6 +24,8 @@ private slots:
     void on_sendButton_clicked();
     void queueUpdate();
     void on_LogData_clicked();
+    void on_logDataButton_clicked();
+    void on_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;

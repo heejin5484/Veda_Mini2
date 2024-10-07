@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "logwindow.h"
+#include "logviewer.h"
 #include "thread.h"
 #include <QDebug>
 #include <QDateTime>
@@ -26,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     // slot connect
     connect(ui->logDataButton, &QPushButton::clicked, this, &MainWindow::on_LogData_clicked);
     connect(thread, SIGNAL(alert()), SLOT(queueUpdate()));
+
 
     thread->start();
 }
@@ -92,4 +94,15 @@ void MainWindow::on_LogData_clicked()
     logWindowInstance->exec();
 }
 
+void MainWindow::on_pushButton_clicked() // db
+{
+    logViewer *viewer = new logViewer(this);
+    viewer->exec();
+}
 
+
+void MainWindow::on_logDataButton_clicked() // log
+{
+    logWindow *logWindowInstance = new logWindow(this);
+    logWindowInstance->show();
+}

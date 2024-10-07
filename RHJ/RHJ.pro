@@ -13,17 +13,20 @@ SOURCES += \
     mainwindow.cpp \
     thread.cpp \
     databasemanager.cpp \
-    logwindow.cpp
+    logwindow.cpp \
+    logviewer.cpp
 
 HEADERS += \
     mainwindow.h \
     thread.h \
     databasemanager.h \
-    logwindow.h
+    logwindow.h \
+    logviewer.h
 
 FORMS += \
     mainwindow.ui \
-    logwindow.ui
+    logwindow.ui \
+    logviewer.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

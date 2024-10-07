@@ -95,14 +95,27 @@
    <widget class="QPushButton" name="logDataButton">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>300</x>
       <y>0</y>
       <width>89</width>
-      <height>30</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
      <string>Log Data</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>0</y>
+      <width>89</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>DB Viewer</string>
     </property>
    </widget>
   </widget>
