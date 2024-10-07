@@ -29,7 +29,7 @@ void MainWindow::on_sendButton_clicked()
     QString message = ui->messageline->text();
     QString dateTime = QDateTime::currentDateTime().toString("HH:mm");
 
-    QString txt = QString("[%1] %2").arg(dateTime, message);
+    QString txt = QString("%1 [%2] : %3").arg(ui->idLabel->text(), dateTime, message);
     ui->textEdit_log->append(txt);
     ui->messageline->clear();
 }
@@ -48,3 +48,21 @@ void MainWindow::queueUpdate(){
     // 업데이트 디버깅용
     ui->textEdit_queue->append(msgqueue.dequeue());
 }
+
+void MainWindow::on_idButton_1_clicked()
+{
+    ui->idLabel->setText("id1");
+}
+
+
+void MainWindow::on_idButton_2_clicked()
+{
+    ui->idLabel->setText("id2");
+}
+
+
+void MainWindow::on_idButton_3_clicked()
+{
+    ui->idLabel->setText("id3");
+}
+
