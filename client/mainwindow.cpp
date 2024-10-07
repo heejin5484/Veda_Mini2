@@ -5,6 +5,8 @@
 #include <QTimer>
 #include <QtNetwork>
 
+#define BLOCK_SIZE      1024
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -26,7 +28,8 @@ MainWindow::~MainWindow()
 void MainWindow::on_connectButton_clicked()
 {
     ui->status_label->setText("Connecting...");
-    tryConnect("127.0.0.1", 54424);
+    // 여기 포트번호 바꿔서 테스트
+    tryConnect("127.0.0.1", 56438);
 }
 
 void MainWindow::tryConnect(QString ip, int port){
@@ -55,6 +58,7 @@ void MainWindow::onConnected()
         ui_chat = new chat(this);
         setCentralWidget(ui_chat);
         connect(ui_chat, &chat::sendMsg_sig,this,&MainWindow::sendMsg);
+        connect(clientSocket, SIGNAL(readyRead( )), SLOT(readMsg()));
     });
 }
 
@@ -66,4 +70,11 @@ void MainWindow::sendMsg(QString msg)
         bytearray = msg.toUtf8();
         clientSocket->write(bytearray);
     }
+}
+
+void MainWindow::readMsg()
+{
+    // 나중에 여기 split해서 파싱한 문자에따라 다르게 동작하게끔 switch문/signal 구현
+    QByteArray bytearray = clientSocket->read(BLOCK_SIZE);
+    emit deliverMsg(bytearray);
 }

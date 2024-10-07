@@ -29,13 +29,15 @@ private slots:
     void on_connectButton_clicked();
     void onConnected();
     void failedConnect();
+    void readMsg();
 
 private:
     Ui::MainWindow *ui;
     chat *ui_chat;
     void tryConnect(QString ip, int port);
 
-
+signals:
+    void deliverMsg(QByteArray msg);
 
 };
 #endif // MAINWINDOW_H

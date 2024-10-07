@@ -10,7 +10,7 @@ chat::chat(QWidget *parent)
 {
     ui->setupUi(this);
     connect(ui->sendButton,&QPushButton::clicked,this,&chat::onSendButtonClicked);
-
+    connect(qobject_cast<MainWindow*>(this->parent()), &MainWindow::deliverMsg, this, &chat::recieveMsg);
 }
 
 chat::~chat()
@@ -28,4 +28,9 @@ void chat::onSendButtonClicked(){
     ui->msgLine->clear();
 
     emit sendMsg_sig(message);
+}
+
+void chat::recieveMsg(QByteArray msg){
+    QString txt = QString(msg);
+    ui->chatLog->append(msg);
 }

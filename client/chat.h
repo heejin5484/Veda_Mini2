@@ -23,6 +23,7 @@ signals :
 
 private slots:
     void onSendButtonClicked();
+    void recieveMsg(QByteArray msg);
 };
 
 #endif // CHAT_H
