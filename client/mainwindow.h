@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include "ui_chat.h"
+#include "chat.h"
+#include <QTcpSocket>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -17,13 +19,25 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    QTcpSocket *clientSocket;
+    QString id;
+
+    void sendMsg(QString msg);
 
 private slots:
 
     void on_connectButton_clicked();
+    void onConnected();
+    void failedConnect();
+    void readMsg();
 
 private:
     Ui::MainWindow *ui;
-    Ui::chat *ui_chat;
+    chat *ui_chat;
+    void tryConnect(QString ip, int port);
+
+signals:
+    void deliverMsg(QByteArray msg);
+
 };
 #endif // MAINWINDOW_H

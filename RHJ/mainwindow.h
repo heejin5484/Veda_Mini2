@@ -27,6 +27,12 @@ private slots:
     void on_logDataButton_clicked();
     void on_pushButton_clicked();
 
+    void on_idButton_1_clicked();
+
+    void on_idButton_2_clicked();
+
+    void on_idButton_3_clicked();
+
 private:
     Ui::MainWindow *ui;
     QQueue<QString> msgqueue;

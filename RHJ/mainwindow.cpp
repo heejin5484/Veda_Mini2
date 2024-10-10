@@ -42,10 +42,11 @@ MainWindow::~MainWindow()
 void MainWindow::on_sendButton_clicked()
 {
     QString message = ui->messageline->text();
-    //QString dateTime = QDateTime::currentDateTime().toString("HH:mm");
-    //QString txt = QString("[%1] %2").arg(dateTime, message);
-    //ui->textEdit_log->append(txt);
-    ui->textEdit_log->append(message);
+    QString dateTime = QDateTime::currentDateTime().toString("HH:mm");
+
+    QString txt = QString("%1 [%2] : %3").arg(ui->idLabel->text(), dateTime, message);
+    ui->textEdit_log->append(txt);
+
     ui->messageline->clear();
 }
 
@@ -106,3 +107,21 @@ void MainWindow::on_logDataButton_clicked() // log
     logWindow *logWindowInstance = new logWindow(this);
     logWindowInstance->show();
 }
+
+void MainWindow::on_idButton_1_clicked()
+{
+    ui->idLabel->setText("id1");
+}
+
+
+void MainWindow::on_idButton_2_clicked()
+{
+    ui->idLabel->setText("id2");
+}
+
+
+void MainWindow::on_idButton_3_clicked()
+{
+    ui->idLabel->setText("id3");
+}
+

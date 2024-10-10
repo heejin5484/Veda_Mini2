@@ -17,6 +17,13 @@ public:
 
 private:
     Ui::chat *ui;
+
+signals :
+    void sendMsg_sig(const QString &msg);
+
+private slots:
+    void onSendButtonClicked();
+    void recieveMsg(QByteArray msg);
 };
 
 #endif // CHAT_H

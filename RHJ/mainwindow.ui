@@ -91,7 +91,7 @@
     <property name="text">
      <string>Log Queue</string>
     </property>
-   </widget>
+    </widget>
    <widget class="QPushButton" name="logDataButton">
     <property name="geometry">
      <rect>
@@ -125,7 +125,7 @@
      <x>0</x>
      <y>0</y>
      <width>549</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
