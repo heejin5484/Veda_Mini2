@@ -91,57 +91,31 @@
     <property name="text">
      <string>Log Queue</string>
     </property>
-   </widget>
-   <widget class="QPushButton" name="idButton_1">
+    </widget>
+   <widget class="QPushButton" name="logDataButton">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>300</x>
       <y>0</y>
-      <width>93</width>
-      <height>29</height>
+      <width>89</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>id1</string>
+     <string>Log Data</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="idButton_2">
+   <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>190</x>
       <y>0</y>
-      <width>93</width>
-      <height>29</height>
+      <width>89</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>id2</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="idButton_3">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>0</y>
-      <width>93</width>
-      <height>29</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>id3</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="idLabel">
-    <property name="geometry">
-     <rect>
-      <x>420</x>
-      <y>10</y>
-      <width>101</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>ID</string>
+     <string>DB Viewer</string>
     </property>
    </widget>
   </widget>

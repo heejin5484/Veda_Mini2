@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QQueue>
 #include "thread.h"
+#include "databasemanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -22,6 +23,9 @@ public:
 private slots:
     void on_sendButton_clicked();
     void queueUpdate();
+    void on_LogData_clicked();
+    void on_logDataButton_clicked();
+    void on_pushButton_clicked();
 
     void on_idButton_1_clicked();
 
@@ -34,7 +38,7 @@ private:
     QQueue<QString> msgqueue;
     int lastCopied = 0;  // 마지막으로 복사된 인덱스
     Thread* thread;
-
+    databaseManager* dbManager;
 };
 
 #endif // MAINWINDOW_H
