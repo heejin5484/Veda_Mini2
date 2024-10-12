@@ -29,7 +29,7 @@ void MainWindow::on_connectButton_clicked()
 {
     ui->status_label->setText("Connecting...");
     // 여기 포트번호 바꿔서 테스트
-    tryConnect("127.0.0.1", 56438);
+    tryConnect("127.0.0.1", 8080);
 }
 
 void MainWindow::tryConnect(QString ip, int port){
