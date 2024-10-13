@@ -24,12 +24,16 @@ loginWindow::~loginWindow()
 
 void loginWindow::on_loginButton_clicked()
 {
-    QJsonObject json;
-    json["type"] = "L"; // 로그인 유형
-    json["username"] = "sy"; // 사용자 이름
-    json["password"] = "4567"; // 비밀번호
+    //QJsonObject json;
+    //json["type"] = "L"; // 로그인 유형
+    //json["username"] = "sy"; // 사용자 이름
+    //json["password"] = "4567"; // 비밀번호
 
-    sendMessageToServer(json);  // JSON 객체를 서버에 전송
+    //sendMessageToServer(json);  // JSON 객체를 서버에 전송
+
+    if (chatWindoww == nullptr) {
+            chatWindoww = new chatWindow();  // chatWindow 객체 생성
+        }
 
     chatWindoww->show();
     this->hide();
