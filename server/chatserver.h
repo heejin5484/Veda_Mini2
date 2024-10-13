@@ -27,11 +27,10 @@ protected :
 
 signals:
     void ProcessData(QByteArray data);
-    void AddUser(USER user);
-
+    void AddUser(USER* user);
+    void DisconnectUser(USER *user);
 private:
     MainWindow *mainwindow;
-
 };
 
 #endif // CHATSERVER_H

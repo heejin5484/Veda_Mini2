@@ -3,10 +3,10 @@
 
 #include <QMainWindow>
 #include <QListWidget>
-#include "chatroom.h"
-#include "ui_chatroom.h"
 #include <QTCPServer>
 #include "chatserver.h"
+
+class chatRoom;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -26,14 +26,19 @@ public:
 
 public slots:
     void on_Login_button_clicked();
-    void UserConnected(USER usr);
+    void UserConnected(USER* usr);
     void DataIncome(QByteArray data);
+    void UserDisconnected(USER *usr);
 
+signals :
+    void NewUserAdd(QString id);
+    void DisconnectUser(QString id);
 
 private:
     Ui::MainWindow *ui;
     void LoginSuccess();
     chatRoom *chatroom;
     void ServerOpen(int address);
+    QMap<QString, USER*> UserMap;
 };
 #endif // MAINWINDOW_H

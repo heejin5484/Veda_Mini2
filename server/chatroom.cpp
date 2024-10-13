@@ -39,3 +39,24 @@ void chatRoom::showContextMenu(const QPoint &pos) {
         contextMenu.exec(ui->userList->mapToGlobal(pos));
     }
 }
+
+void chatRoom::addUserList(QString id){
+    qDebug() << id;
+    ui->userList->addItem(id);
+}
+
+void chatRoom::deleteUserList(QString id){
+    qDebug() << id << " disconnected.";
+
+    // QListWidget에서 해당 ID를 찾음
+    QList<QListWidgetItem*> items = ui->userList->findItems(id, Qt::MatchExactly);
+
+    // 찾은 항목이 있을 경우 제거
+    if (!items.isEmpty()) {
+        // 첫 번째 항목을 가져와서 제거
+        delete ui->userList->takeItem(ui->userList->row(items[0]));
+        qDebug() << id << " removed from user list.";
+    } else {
+        qDebug() << id << " not found in user list.";
+    }
+}

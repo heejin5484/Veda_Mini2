@@ -50,6 +50,19 @@ void MainWindow::onConnected()
 {
     ui->status_label->setText("Connecting succeeded!");
 
+    // 연결된 직후 USER 정보를 서버로 전송 (나중에 수정)
+    QJsonObject userInfo;
+    userInfo["ID"] = id;  // 클라이언트 ID
+    userInfo["password"] = "1234";  // 예시 비밀번호
+    userInfo["name"] = "TestName";  // 예시 이름
+
+    QJsonDocument doc(userInfo);
+    QByteArray userData = doc.toJson(QJsonDocument::Compact);
+
+    // USER 정보를 서버로 전송
+    clientSocket->write(userData);
+    clientSocket->flush();  // 데이터를 즉시 서버로 전송
+
     // 2초 대기 후 chat 위젯을 중앙에 배치
     QTimer::singleShot(2000, this, [this]() {
         if (centralWidget()) {

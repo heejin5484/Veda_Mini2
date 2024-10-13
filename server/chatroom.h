@@ -2,6 +2,8 @@
 #define CHATROOM_H
 
 #include <QWidget>
+#include "chatserver.h"
+
 
 namespace Ui {
 class chatRoom;
@@ -17,6 +19,8 @@ public:
 
 public slots:
     void showContextMenu(const QPoint &pos);
+    void addUserList(QString id);
+    void deleteUserList(QString id);
 
 private:
     Ui::chatRoom *ui;
