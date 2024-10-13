@@ -133,7 +133,8 @@ void MainWindow::on_idButton_3_clicked()
 
 void MainWindow::on_startButton_clicked()
 {
-    loginWindow *loginWindowInstance = new loginWindow(this);  // 변수 이름을 loginWindowInstance로 변경
+    NetworkManager *networkManager = new NetworkManager;
+    loginWindow *loginWindowInstance = new loginWindow(networkManager, this);  // 변수 이름을 loginWindowInstance로 변경
     loginWindowInstance->show();
     this->hide();
 }

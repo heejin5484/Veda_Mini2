@@ -9,6 +9,7 @@
 #include <QHostAddress>
 #include <QDateTime>
 #include "chatwindow.h"
+#include "networkmanager.h"
 
 namespace Ui {
 class loginWindow;  // 대문자로 유지
@@ -19,7 +20,7 @@ class loginWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit loginWindow(QWidget *parent = nullptr);
+    explicit loginWindow(NetworkManager *networkManager, QWidget *parent = nullptr);
     ~loginWindow();
 
 private slots:
@@ -35,6 +36,7 @@ private:
     Ui::loginWindow *ui;
     QTcpSocket *socket;
     chatWindow *chatWindoww;
+    NetworkManager *networkManager;
 };
 
 #endif // LOGINWINDOW_H

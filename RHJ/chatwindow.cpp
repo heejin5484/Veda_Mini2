@@ -2,18 +2,21 @@
 #include "ui_chatwindow.h"
 #include "logviewer.h"
 #include "logwindow.h"
+#include "searchwindow.h"
+#include "networkmanager.h"
 
 
-chatWindow::chatWindow(QWidget *parent) :
+chatWindow::chatWindow(NetworkManager *networkManager, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::chatWindow),
-    thread(new Thread(this))
+    thread(new Thread(this)),
+    networkManager(networkManager)
 {
     ui->setupUi(this);
 
     // 데이터베이스 초기화
-    dbManager = new databaseManager("logs.db");
-    if (!dbManager->init()) {
+    databaseManager& dbManager = databaseManager::getInstance();
+    if (!dbManager.init()) {
         qDebug() << "Database initialization failed.";
     }
 
@@ -21,7 +24,7 @@ chatWindow::chatWindow(QWidget *parent) :
     connect(thread, &Thread::alert, this, &chatWindow::queueUpdate);
     thread->start(); // 스레드 시작
     connect(ui->logData, &QPushButton::clicked, this, &chatWindow::on_logData_clicked);
-
+    connect(ui->fileSendBtn, &QPushButton::clicked, this, &chatWindow::on_fileSendBtn_clicked);
 
 }
 
@@ -30,7 +33,6 @@ chatWindow::~chatWindow()
     thread->quit(); // 스레드 종료
     thread->wait(); // 스레드 종료 대기
     delete ui;
-    delete dbManager;
     delete thread; // 스레드 삭제
 }
 
@@ -39,18 +41,55 @@ void chatWindow::on_sendButton_clicked()
     QString message = ui->messageline->text();
     ui->textEdit_log->append(message);
     ui->messageline->clear();
-}
 
-void chatWindow::saveMessage(const QString &message)
-{
-    QSqlQuery query;
-    query.prepare("INSERT INTO log_messages (message) VALUES (:message)");
-    query.bindValue(":message", message);
+    // 서버에 메시지 전송
+    QJsonObject json;
+    json["type"] = "M"; // 메시지 전송 유형
+    json["message"] = message;
 
-    if (!query.exec()) {
-        qDebug() << "Failed to save message to database: " << query.lastError().text();
+    networkManager->sendMessage(json); // NetworkManager를 통해 서버에 전송
+
+    // 데이터베이스에 메시지 저장
+    if (!dbManager->saveMessage(message)) {
+        qDebug() << "Failed to save message to database";
     }
+
+    ui->sendButton->setEnabled(false);
+
+        // 타임아웃을 설정하여 버튼을 다시 활성화 (예: 1초 후)
+        QTimer::singleShot(1000, this, [this]() {
+            ui->sendButton->setEnabled(true);
+        });
 }
+
+void chatWindow::on_fileSendBtn_clicked()
+{
+    qDebug() << "on_fileSendBtn_clicked() called";
+    // 파일 선택 다이얼로그 열기
+    QString fileName = QFileDialog::getOpenFileName(this, tr("파일 선택"), "", tr("모든 파일 (*.*)"));
+    if (fileName.isEmpty()) {
+        return; // 사용자가 파일 선택을 취소한 경우
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "파일을 열 수 없습니다: " << file.errorString();
+        return;
+    }
+
+    // 파일 데이터 읽기
+    QByteArray fileData = file.readAll();
+    file.close();
+
+    // 서버로 전송할 JSON 객체 생성
+    QJsonObject json;
+    json["type"] = "F"; // 파일 전송 유형
+    json["filename"] = QFileInfo(file).fileName(); // 파일 이름
+    //json["data"] = QString::fromUtf8(fileData.toBase64()); // 파일 데이터를 Base64로 인코딩
+    json["filePath"] = fileName; // 파일의 전체 경로
+    networkManager->sendMessage(json); // NetworkManager를 통해 서버에 전송
+}
+
 
 void chatWindow::queueUpdate()
 {
@@ -68,14 +107,11 @@ void chatWindow::queueUpdate()
         QString msg = msgqueue.dequeue();
         ui->textEdit_queue->append(msg);
 
-        if(!dbManager->saveMessage(msg)) {
-            qDebug() << "Failed to save message to database";
-        }
+        //if(!dbManager->saveMessage(msg)) {
+            //qDebug() << "Failed to save message to database";
+        //}
     }
 }
-
-
-
 
 void chatWindow::on_dbData_clicked()
 {
@@ -105,3 +141,12 @@ void chatWindow::on_logData_clicked()
     logWindowInstance->exec();
 
 }
+
+void chatWindow::on_searchBtn_clicked()
+{
+    SearchWindow *searchWin = new SearchWindow(this);
+    searchWin->exec(); // 모달로 실행
+    delete searchWin;
+}
+
+

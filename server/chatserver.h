@@ -6,6 +6,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QDebug>
+#include <QFileDialog>
+#include <QFile>
 
 class ChatServer : public QTcpServer {
     Q_OBJECT

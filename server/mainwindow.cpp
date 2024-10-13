@@ -16,7 +16,7 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::startServer() {
-    if (!server->listen(QHostAddress::Any, 8888)) {
+    if (!server->listen(QHostAddress::Any, 8889)) {
         qDebug() << "Server could not start!";
     } else {
         qDebug() << "Server started on port" << server->serverPort();

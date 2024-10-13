@@ -16,7 +16,9 @@ SOURCES += \
     logwindow.cpp \
     logviewer.cpp \
     loginwindow.cpp \
-    chatwindow.cpp
+    chatwindow.cpp \
+    searchwindow.cpp \
+    networkmanager.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -25,14 +27,17 @@ HEADERS += \
     logwindow.h \
     logviewer.h \
     loginwindow.h \
-    chatwindow.h
+    chatwindow.h \
+    searchwindow.h \
+    networkmanager.h
 
 FORMS += \
     mainwindow.ui \
     logwindow.ui \
     logviewer.ui \
     loginwindow.ui \
-    chatwindow.ui
+    chatwindow.ui \
+    searchwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
