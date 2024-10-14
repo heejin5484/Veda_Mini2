@@ -15,10 +15,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , server(new ChatServer(this))
 {
     ui->setupUi(this);
-    startServer();
 }
 
 MainWindow::~MainWindow()
@@ -57,21 +55,21 @@ void MainWindow::UserConnected(USER* usr){
 void MainWindow::DataIncome(QByteArray data, USER *user){
     qDebug() << "Data Incoming from user:" << user->ID;
 
-    // JSON í˜•ì‹ìœ¼ë¡œ ë°ì´í„° íŒŒì‹± (msg íƒ€ìž… ì—¬ë¶€ í™•ì¸)
+    // JSON ?˜•?‹?œ¼ë¡? ?°?´?„° ?ŒŒ?‹± (msg ????ž… ?—¬ë¶? ?™•?¸)
     //QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
     //QJsonObject jsonObj = jsonDoc.object();
 
-    //QString type = jsonObj["type"].toString();  // ë°ì´í„° íƒ€ìž… í™•ì¸
-    //QString msg = jsonObj["message"].toString();  // ë©”ì‹œì§€ ë‚´ìš©
+    //QString type = jsonObj["type"].toString();  // ?°?´?„° ????ž… ?™•?¸
+    //QString msg = jsonObj["message"].toString();  // ë©”ì‹œì§? ?‚´?š©
 
     //if (type == "msg") {
-        // ë³´ë‚¸ ì‚¬ìš©ìžë¥¼ ì œì™¸í•œ ëª¨ë“  ì‚¬ìš©ìžì—ê²Œ ë©”ì‹œì§€ ì „ë‹¬
+        // ë³´ë‚¸ ?‚¬?š©?žë¥? ? œ?™¸?•œ ëª¨ë“  ?‚¬?š©?ž?—ê²? ë©”ì‹œì§? ? „?‹¬
         for (auto otherUser : UserMap) {
-            if (otherUser != user) {  // ë³´ë‚¸ ì‚¬ìš©ìž ì œì™¸
+            if (otherUser != user) {  // ë³´ë‚¸ ?‚¬?š©?ž ? œ?™¸
                 if (otherUser->usersocket) {
-                    // ë‹¤ë¥¸ ì‚¬ìš©ìžì—ê²Œ ë©”ì‹œì§€ ì „ì†¡
+                    // ?‹¤ë¥? ?‚¬?š©?ž?—ê²? ë©”ì‹œì§? ? „?†¡
                     otherUser->usersocket->write(data);
-                    otherUser->usersocket->flush();  // ë²„í¼ì— ìŒ“ì¸ ë°ì´í„°ë¥¼ ì¦‰ì‹œ ì „ì†¡
+                    otherUser->usersocket->flush();  // ë²„í¼?— ?Œ“?¸ ?°?´?„°ë¥? ì¦‰ì‹œ ? „?†¡
                 }
             }
         }
@@ -89,7 +87,7 @@ void MainWindow::UserDisconnected(USER *usr){
     }
 
     if (usr->usersocket) {
-        delete usr->usersocket;  // ì†Œì¼“ ë¨¼ì € ì‚­ì œ
+        delete usr->usersocket;  // ?†Œì¼? ë¨¼ì?? ?‚­? œ
     }
     delete usr;
     qDebug() << "User object deleted";

@@ -4,7 +4,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network
 
 CONFIG += c++17
 
-# ½ÇÇà ÆÄÀÏ ÀÌ¸§ ¼³Á¤
+# execute file name
 TARGET = Server
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -16,7 +16,6 @@ SOURCES += \
     chatserver.cpp \
     main.cpp \
     mainwindow.cpp \
-    chatserver.cpp
 
 HEADERS += \
     chatroom.h \
