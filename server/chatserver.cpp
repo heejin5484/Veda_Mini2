@@ -31,10 +31,10 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
     clientMap.insert(clientSocket, user);
 
     // 스레드 시작되면 데이터 송수신 처리
-    connect(thread, &QThread::started, clientSocket, [=](){
+    connect(thread, &QThread::started, clientSocket, [=]() {
         qDebug() << "Client connected in new thread";
 
-        if (clientSocket->waitForReadyRead()){
+        if (clientSocket->waitForReadyRead()) {
             QByteArray data = clientSocket->readAll();
             qDebug() << "user data:" << data;
 
@@ -48,11 +48,11 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
             QString password = jsonObj["password"].toString();
             QString name = jsonObj["name"].toString();
 
-            if (!id.isEmpty()){
+            if (!id.isEmpty()) {
                 emit AddUser(user);
 
                 // 클라이언트 소켓이 준비되었을 때 데이터 읽기
-                connect(clientSocket, &QTcpSocket::readyRead, [=](){
+                connect(clientSocket, &QTcpSocket::readyRead, [=]() {
                     QByteArray data = clientSocket->readAll();
                     // 수신한 데이터 처리
                     emit ProcessData(data, user);
@@ -66,7 +66,7 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
     });
 
     // 클라이언트가 연결 종료시 처리
-    connect(clientSocket, &QTcpSocket::disconnected, [=](){
+    connect(clientSocket, &QTcpSocket::disconnected, [=]() {
         qDebug() << "Client disconnected: " << user->ID;
 
         emit DisconnectUser(user);
@@ -74,16 +74,13 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
         // 소켓과 USER 삭제
         clientMap.remove(clientSocket);
 
-        // 메인 스레드에서 스레드 종료를 처리하기 위해 여기서 처리하지 않고 외부에서 처리
-        QMetaObject::invokeMethod(this, [=]() {
-            // 스레드가 종료되지 않았다면 종료를 기다림
-            if (thread->isRunning()) {
-                thread->quit();
-                thread->wait();  // 스레드가 실행 중일 때만 대기
-            }
-            threadList.removeOne(thread);  // 스레드 리스트에서 삭제
-            thread->deleteLater();
-        });
+        // 메인 스레드에서 스레드 종료를 처리하기 위해 직접 호출
+        if (thread->isRunning()) {
+            thread->quit();
+            thread->wait();  // 스레드가 실행 중일 때만 대기
+        }
+        threadList.removeOne(thread);  // 스레드 리스트에서 삭제
+        thread->deleteLater();
 
         qDebug() << "Client disconnected and thread finished";
     });
@@ -91,6 +88,7 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
     thread->start();
     qDebug() << "init thread";
 }
+
 
 /*
 void ChatServer::processMessage(const QByteArray &data, QTcpSocket *socket) {

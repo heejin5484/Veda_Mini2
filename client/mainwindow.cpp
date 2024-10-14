@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->setupUi(this);
     clientSocket = new QTcpSocket(this);
-    connect(clientSocket, &QAbstractSocket::errorOccurred, this, &MainWindow::failedConnect);
+    connect(clientSocket, &QTcpSocket::errorOccurred, this, &MainWindow::failedConnect);
     connect(clientSocket, &QTcpSocket::connected, this, &MainWindow::onConnected);
 }
 
@@ -70,7 +70,7 @@ void MainWindow::onConnected()
         ui_chat = new chat(this);
         setCentralWidget(ui_chat);
         connect(ui_chat, &chat::sendMsg_sig,this,&MainWindow::sendMsg);
-        connect(clientSocket, SIGNAL(readyRead( )), SLOT(readMsg()));
+        connect(clientSocket, &QTcpSocket::readyRead, this, &MainWindow::readMsg);
     });
 }
 

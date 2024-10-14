@@ -6,6 +6,7 @@
 #include "chat.h"
 #include <QTcpSocket>
 
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
