@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>616</width>
-    <height>460</height>
+    <width>669</width>
+    <height>580</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,29 +16,29 @@
   <widget class="QListWidget" name="userList">
    <property name="geometry">
     <rect>
-     <x>410</x>
-     <y>20</y>
+     <x>470</x>
+     <y>10</y>
      <width>181</width>
-     <height>231</height>
+     <height>441</height>
     </rect>
    </property>
   </widget>
   <widget class="QTextEdit" name="textEdit">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>20</y>
-     <width>391</width>
-     <height>231</height>
+     <x>20</x>
+     <y>460</y>
+     <width>631</width>
+     <height>71</height>
     </rect>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>270</y>
-     <width>391</width>
+     <x>20</x>
+     <y>540</y>
+     <width>441</width>
      <height>26</height>
     </rect>
    </property>
@@ -46,14 +46,27 @@
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>410</x>
-     <y>270</y>
+     <x>470</x>
+     <y>540</y>
      <width>181</width>
      <height>29</height>
     </rect>
    </property>
    <property name="text">
     <string>Send</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="cameraView">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>431</width>
+     <height>431</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
    </property>
   </widget>
  </widget>

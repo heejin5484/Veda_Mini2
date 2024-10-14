@@ -1,4 +1,4 @@
-QT       += core gui network
+QT       += core gui network multimedia multimediawidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network
 
@@ -12,12 +12,14 @@ TARGET = Server
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    #cameraserver.cpp \
     chatroom.cpp \
     chatserver.cpp \
     main.cpp \
     mainwindow.cpp \
 
 HEADERS += \
+    #cameraserver.h \
     chatroom.h \
     chatserver.h \
     mainwindow.h

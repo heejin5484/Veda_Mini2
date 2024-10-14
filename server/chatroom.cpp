@@ -1,23 +1,81 @@
 #include "chatroom.h"
 #include "ui_chatroom.h"
 #include <QMenu>
+#include <QCamera>
+#include <QMediaCaptureSession>
+#include <QMediaDevices>
+#include <QImageCapture>
+#include <QPainter>
+#include <QImage>
+#include <QMediaCaptureSession>
+#include <QTimer>
 
 chatRoom::chatRoom(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::chatRoom)
+    , camera(nullptr)
+    , imageCapture(nullptr)
+    , captureSession(new QMediaCaptureSession)
 {
     ui->setupUi(this);
+    //ui->cameraView->setMinimumSize(640, 480);
+
+    // 카메라 장치 설정
+    camera = new QCamera(QMediaDevices::defaultVideoInput(), this);
+
+    // 미디어 캡처 세션 설정
+    captureSession->setCamera(camera);
+
+    // 이미지 캡처 객체 설정
+    imageCapture = new QImageCapture(this);
+    captureSession->setImageCapture(imageCapture);
+
+    // 카메라 시작
+    qDebug() << "Starting camera...";
+    camera->start();
+
+    // 주기적으로 이미지 캡쳐
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &chatRoom::captureImage);
+    timer->start(100);  // 0.1초(100ms) 간격으로 이미지 캡처
+
+
+    // 이미지 캡처 후 화면에 그리기
+    connect(imageCapture, &QImageCapture::imageCaptured, this, &chatRoom::onImageCaptured);
 
     ui->userList->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->userList, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showContextMenu(QPoint)));
 }
 
-
 chatRoom::~chatRoom()
 {
     delete ui;
+    delete camera;
+    delete imageCapture;
+    delete captureSession;
 }
 
+void chatRoom::captureImage()
+{
+    if (imageCapture->isReadyForCapture()) {
+        qDebug() << "Capturing image...";
+        imageCapture->capture();  // 이미지를 캡처
+    } else {
+        qDebug() << "Image capture is not ready.";
+    }
+}
+
+void chatRoom::onImageCaptured(int id, const QImage &image)
+{
+    Q_UNUSED(id);
+    qDebug() << "Image Captured:" << !image.isNull();
+
+    if (!image.isNull()) {
+        // 캡처된 이미지를 QLabel에 맞게 크기 조정하여 설정
+        QPixmap pixmap = QPixmap::fromImage(image).scaled(ui->cameraView->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        ui->cameraView->setPixmap(pixmap);  // QLabel에 Pixmap 설정
+    }
+}
 
 void chatRoom::showContextMenu(const QPoint &pos) {
     QListWidgetItem *item = ui->userList->itemAt(pos);

@@ -4,6 +4,9 @@
 #include <QWidget>
 #include "chatserver.h"
 
+class QMediaCaptureSession;
+class QCamera;
+class QImageCapture;
 
 namespace Ui {
 class chatRoom;
@@ -21,9 +24,16 @@ public slots:
     void showContextMenu(const QPoint &pos);
     void addUserList(QString id);
     void deleteUserList(QString id);
+    void onImageCaptured(int id, const QImage &image);
+    void captureImage();
 
 private:
     Ui::chatRoom *ui;
+    QCamera* camera;
+    QImageCapture* imageCapture;
+    QMediaCaptureSession* captureSession;
+
+    QImage capturedImage;
 };
 
 #endif // CHATROOM_H
