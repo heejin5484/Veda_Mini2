@@ -1,3 +1,4 @@
+#include "joinwindow.h"
 #include "loginwindow.h"
 #include "ui_loginwindow.h"
 #include "chatwindow.h"
@@ -7,6 +8,7 @@ loginWindow::loginWindow(NetworkManager *networkManager, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::loginWindow),
     chatWindoww(nullptr),
+    joinWindow(nullptr),
     networkManager(networkManager)
 {
     ui->setupUi(this);
@@ -21,16 +23,12 @@ loginWindow::~loginWindow()
 {
     delete ui;
     delete chatWindoww;
+    delete joinWindow;
 }
 
 void loginWindow::on_loginButton_clicked()
 {
-    //QJsonObject json;
-    //json["type"] = "L"; // 로그인 유형
-    //json["username"] = "sy"; // 사용자 이름
-    //json["password"] = "4567"; // 비밀번호
 
-    //networkManager->sendMessage(json);  // JSON 객체를 서버에 전송
 
     if (chatWindoww == nullptr) {
             chatWindoww = new chatWindow(networkManager);  // chatWindow 객체 생성
@@ -57,12 +55,22 @@ void loginWindow::on_logoutBtn_clicked()
 
 void loginWindow::on_joinBtn_clicked()
 {
-    QJsonObject json;
-    json["type"] = "J"; // 회원가입 유형
-    json["username"] = "sy"; // 사용자 이름
-    json["password"] = "1234"; // 비밀번호
+    //QJsonObject json;
+    //json["type"] = "J"; // 회원가입 유형
+    //json["username"] = "sy"; // 사용자 이름
+    //json["password"] = "1234"; // 비밀번호
 
-    networkManager->sendMessage(json);  // JSON 객체를 서버에 전송
+    //networkManager->sendMessage(json);  // JSON 객체를 서버에 전송
+    qDebug() << "Join button clicked";  // 로그 추가
+
+        if (joinWindow == nullptr) {
+            qDebug() << "Creating JoinWindow instance";  // 로그 추가
+            joinWindow = new JoinWindow(networkManager, this);  // JoinWindow 생성
+        }
+
+        qDebug() << "Showing JoinWindow";  // 로그 추가
+        joinWindow->show();  // 회원가입 창을 표시
+        this->hide();
 }
 
 void loginWindow::on_inviteBtn_clicked()

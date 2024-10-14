@@ -28,3 +28,7 @@ void NetworkManager::sendMessage(const QJsonObject &json) {
         qDebug() << "소켓이 연결되지 않았습니다.";
     }
 }
+
+void NetworkManager::handleSignupResponse(bool success) {
+    emit signupResponse(success);  // 회원가입 응답을 emit(발송)
+}

@@ -11,6 +11,8 @@
 #include "chatwindow.h"
 #include "networkmanager.h"
 
+class JoinWindow;
+
 namespace Ui {
 class loginWindow;  // 대문자로 유지
 }
@@ -37,6 +39,7 @@ private:
     QTcpSocket *socket;
     chatWindow *chatWindoww;
     NetworkManager *networkManager;
+    JoinWindow *joinWindow;
 };
 
 #endif // LOGINWINDOW_H
