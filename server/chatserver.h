@@ -14,6 +14,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QFile>
+#include "databasemanager.h"
 
 class MainWindow;
 
@@ -51,6 +52,11 @@ private:
     MainWindow *mainwindow;
     QList<QThread*> threadList; // 스레드 목록 관리
     QMap<QTcpSocket*, USER*> clientMap; // 소켓과 USER를 매핑하여 관리
+
+    DatabaseManager *dbManager; // 데이터베이스 매니저 추가
+
+    void processMessage(const QByteArray &data, QTcpSocket *socket);
+    void sendResponse(QTcpSocket *socket, const QJsonObject &response);
 };
 
 #endif // CHATSERVER_H

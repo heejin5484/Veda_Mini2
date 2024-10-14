@@ -6,9 +6,12 @@
 #include <QDir>
 
 ChatServer::ChatServer(QObject *parent)
-    : QTcpServer(parent), mainwindow(nullptr)
+    : QTcpServer(parent), mainwindow(static_cast<MainWindow*>(parent)), dbManager(new DatabaseManager("users.db"))
 {
-    mainwindow = static_cast<MainWindow*>(parent);
+    if (!dbManager->init()) {
+            qDebug() << "Database initialization failed.";
+            return;
+        }
 
     // 나중에 스레드풀같은거 생각해보기
 
@@ -90,7 +93,6 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
 }
 
 
-/*
 void ChatServer::processMessage(const QByteArray &data, QTcpSocket *socket) {
     qDebug() << "Received:" << data;
 
@@ -110,17 +112,18 @@ void ChatServer::processMessage(const QByteArray &data, QTcpSocket *socket) {
         QString type = json["type"].toString();
 
         // 메시지 타입에 따른 처리
-        if (type == "L") {
+        if (type == "L") { // 로그인 처리
             QString username = json["username"].toString();
             qDebug() << username << "logged in";
 
-            // 응답 보내기
+            // DB에서 사용자 확인
+            bool loginSuccess = dbManager->checkUser(username, json["password"].toString());
             QJsonObject response;
             response["type"] = "L";
-            response["status"] = "success";
+            response["status"] = loginSuccess ? "success" : "failure";
             sendResponse(socket, response);
         }
-        else if (type == "O") {
+        else if (type == "O") { // 로그아웃 처리
             QString username = json["username"].toString();
             qDebug() << username << "logged out";
 
@@ -130,18 +133,21 @@ void ChatServer::processMessage(const QByteArray &data, QTcpSocket *socket) {
             response["status"] = "success";
             sendResponse(socket, response);
         }
-        else if (type == "J") {
+        else if (type == "J") { // 사용자 가입 처리
             QString username = json["username"].toString();
             QString password = json["password"].toString();
-            qDebug() << "User joined:" << username;
+            QString name = json["name"].toString();
+            QString phone = json["phone"].toString();
+            QString email = json["email"].toString();
 
-            // 응답 보내기
+            // DB에 사용자 저장
+            bool signupSuccess = dbManager->saveUserData(username, password, name, phone, email);
             QJsonObject response;
             response["type"] = "J";
-            response["status"] = "success";
+            response["status"] = signupSuccess ? "success" : "failure";
             sendResponse(socket, response);
         }
-        else if (type == "I") {
+        else if (type == "I") { // 초대 처리
             QString admin = json["admin"].toString();
             QString target = json["target"].toString();
             qDebug() << admin << "invited" << target;
@@ -152,7 +158,7 @@ void ChatServer::processMessage(const QByteArray &data, QTcpSocket *socket) {
             response["status"] = "success";
             sendResponse(socket, response);
         }
-        else if (type == "G") {
+        else if (type == "G") { // 철회 처리
             QString admin = json["admin"].toString();
             QString target = json["target"].toString();
             qDebug() << admin << "withdrawal out" << target;
@@ -163,7 +169,7 @@ void ChatServer::processMessage(const QByteArray &data, QTcpSocket *socket) {
             response["status"] = "success";
             sendResponse(socket, response);
         }
-        else if (type == "F") {
+        else if (type == "F") { // 파일 업로드 처리
             QString filename = json["filename"].toString();
             QString filePath = json["filePath"].toString(); // 파일 경로를 가져옴
 
@@ -192,6 +198,12 @@ void ChatServer::processMessage(const QByteArray &data, QTcpSocket *socket) {
                         destinationFile.write(fileData); // 파일 데이터를 쓰기
                         destinationFile.close(); // 파일 닫기
                         qDebug() << "파일 저장 성공: " << filename;
+
+                        // 파일 저장 성공 응답
+                        QJsonObject response;
+                        response["type"] = "F";
+                        response["status"] = "success";
+                        sendResponse(socket, response);
                     } else {
                         qDebug() << "파일 저장 실패: " << destinationFile.errorString();
                     }
@@ -207,11 +219,9 @@ void ChatServer::processMessage(const QByteArray &data, QTcpSocket *socket) {
     }
 }
 
-
+// 응답을 클라이언트에게 전송하는 메서드
 void ChatServer::sendResponse(QTcpSocket *socket, const QJsonObject &response) {
     QJsonDocument doc(response);
-    QByteArray data = doc.toJson(QJsonDocument::Compact);
-    socket->write(data + "\n");
-    socket->waitForBytesWritten(3000);
+    QByteArray data = doc.toJson();
+    socket->write(data + "\n"); // JSON 응답 뒤에 줄바꿈 추가
 }
-*/

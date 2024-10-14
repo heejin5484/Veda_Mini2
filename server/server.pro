@@ -1,6 +1,6 @@
 QT       += core gui network
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network sql
 
 CONFIG += c++17
 
@@ -16,11 +16,13 @@ SOURCES += \
     chatserver.cpp \
     main.cpp \
     mainwindow.cpp \
+    databasemanager.cpp
 
 HEADERS += \
     chatroom.h \
     chatserver.h \
-    mainwindow.h
+    mainwindow.h \
+    databasemanager.h
 
 FORMS += \
     chatroom.ui \

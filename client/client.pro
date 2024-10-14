@@ -4,7 +4,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
 
-# ½ÇÇà ÆÄÀÏ ÀÌ¸§ ¼³Á¤
+# ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½
 TARGET = Client
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -14,15 +14,20 @@ TARGET = Client
 SOURCES += \
     chat.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    networkmanager.cpp \
+    joinwindow.cpp
 
 HEADERS += \
     chat.h \
-    mainwindow.h
+    mainwindow.h \
+    networkmanager.h \
+    joinwindow.h
 
 FORMS += \
     chat.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    joinwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

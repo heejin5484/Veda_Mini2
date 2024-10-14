@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "chat.h"
+#include "networkmanager.h"
 #include <QDebug>
 #include <QTimer>
 #include <QtNetwork>
@@ -8,14 +9,18 @@
 #define BLOCK_SIZE      1024
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    : QMainWindow(parent),
+     ui(new Ui::MainWindow),
+     joinWindow(nullptr)
+
 {
 
     ui->setupUi(this);
     clientSocket = new QTcpSocket(this);
-    connect(clientSocket, &QTcpSocket::errorOccurred, this, &MainWindow::failedConnect);
+    //connect(clientSocket, &QTcpSocket::errorOccurred, this, &MainWindow::failedConnect);
     connect(clientSocket, &QTcpSocket::connected, this, &MainWindow::onConnected);
+    connect(ui->JoinButton, &QPushButton::clicked, this, &MainWindow::on_JoinButton_clicked);
+
 }
 
 MainWindow::~MainWindow()
@@ -89,4 +94,18 @@ void MainWindow::readMsg()
     // 나중에 여기 split해서 파싱한 문자에따라 다르게 동작하게끔 switch문/signal 구현
     QByteArray bytearray = clientSocket->read(BLOCK_SIZE);
     emit deliverMsg(bytearray);
+}
+
+void MainWindow::on_JoinButton_clicked()
+{
+    qDebug() << "Join button clicked"; // 디버깅을 위한 메시지
+
+    if (joinWindow == nullptr) {
+        NetworkManager *networkManager = new NetworkManager(this);
+        joinWindow = new JoinWindow(networkManager, this);
+        connect(joinWindow, &JoinWindow::finished, this, [this]() {
+            joinWindow = nullptr;
+        });
+    }
+    joinWindow->exec();
 }

@@ -4,8 +4,8 @@
 #include <QMainWindow>
 #include "ui_chat.h"
 #include "chat.h"
+#include "joinwindow.h"
 #include <QTcpSocket>
-
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -33,7 +33,10 @@ private slots:
     void readMsg();
 
 private:
+    void on_JoinButton_clicked();
+
     Ui::MainWindow *ui;
+    JoinWindow *joinWindow;
     chat *ui_chat;
     void tryConnect(QString ip, int port);
 
