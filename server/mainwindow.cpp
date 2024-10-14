@@ -60,6 +60,9 @@ void MainWindow::UserDisconnected(USER *usr){
         emit DisconnectUser(usr->ID);
     }
 
+    if (usr->usersocket) {
+        delete usr->usersocket;  // 소켓 먼저 삭제
+    }
     delete usr;
     qDebug() << "User object deleted";
 

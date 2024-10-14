@@ -4,6 +4,9 @@
 #include <QTcpSocket>
 #include <QCoreApplication>
 #include <QThread>
+#include <QList>
+#include <QMap>
+#include <QPair>
 
 class MainWindow;
 
@@ -29,8 +32,11 @@ signals:
     void ProcessData(QByteArray data);
     void AddUser(USER* user);
     void DisconnectUser(USER *user);
+
 private:
     MainWindow *mainwindow;
+    QList<QThread*> threadList; // 스레드 목록 관리
+    QMap<QTcpSocket*, USER*> clientMap; // 소켓과 USER를 매핑하여 관리
 };
 
 #endif // CHATSERVER_H
