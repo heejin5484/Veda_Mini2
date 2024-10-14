@@ -11,8 +11,6 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    //나중에 id 입력 구현
-    id = "test";
 
     ui->setupUi(this);
     clientSocket = new QTcpSocket(this);
@@ -27,9 +25,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_connectButton_clicked()
 {
+    // 나중에 로그인 구현
+    id = ui->ID_Edit->text();
     ui->status_label->setText("Connecting...");
-    // 여기 포트번호 바꿔서 테스트
-    tryConnect("127.0.0.1", 56438);
+    tryConnect("127.0.0.1", 8080);
 }
 
 void MainWindow::tryConnect(QString ip, int port){
@@ -49,6 +48,19 @@ void MainWindow::failedConnect()
 void MainWindow::onConnected()
 {
     ui->status_label->setText("Connecting succeeded!");
+
+    // 연결된 직후 USER 정보를 서버로 전송 (나중에 수정)
+    QJsonObject userInfo;
+    userInfo["ID"] = id;  // 클라이언트 ID
+    userInfo["password"] = "1234";  // 예시 비밀번호
+    userInfo["name"] = "TestName";  // 예시 이름
+
+    QJsonDocument doc(userInfo);
+    QByteArray userData = doc.toJson(QJsonDocument::Compact);
+
+    // USER 정보를 서버로 전송
+    clientSocket->write(userData);
+    clientSocket->flush();  // 데이터를 즉시 서버로 전송
 
     // 2초 대기 후 chat 위젯을 중앙에 배치
     QTimer::singleShot(2000, this, [this]() {
