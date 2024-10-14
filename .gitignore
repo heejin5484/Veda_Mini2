@@ -64,5 +64,15 @@ _Sample/ThreadApp/build/
 RHJ/build/
 RHJ/RHJ/build/
 PSY/build/
+server/server/build
+RHJ/.qmake.stash
+RHJ/RHJ
+client/.qmake.stash
+client/client
+server/.qmake.stash
+server/server
+Client
+Server
 
-
+# 현재 디렉터리의 Makefile은 무시하지 않음
+!/Makefile

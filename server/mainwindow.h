@@ -2,7 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QListWidget>
+#include <QTcpServer>
 #include "chatserver.h"
+
+class chatRoom;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -17,12 +21,25 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    QTcpServer *server;
+
+
+public slots:
+    void on_Login_button_clicked();
+    void UserConnected(USER* usr);
+    void DataIncome(QByteArray data, USER* user);
+    void UserDisconnected(USER *usr);
+
+signals :
+    void NewUserAdd(QString id);
+    void DisconnectUser(QString id);
 
 private:
     Ui::MainWindow *ui;
-    ChatServer *server;
+    void LoginSuccess();
+    chatRoom *chatroom;
+    void ServerOpen(int address);
+    QMap<QString, USER*> UserMap;
 
-private slots:
-    void startServer();
 };
 #endif // MAINWINDOW_H
