@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QListWidget>
-#include <QTCPServer>
+#include <QTcpServer>
 #include "chatserver.h"
 
 class chatRoom;
@@ -27,7 +27,7 @@ public:
 public slots:
     void on_Login_button_clicked();
     void UserConnected(USER* usr);
-    void DataIncome(QByteArray data);
+    void DataIncome(QByteArray data, USER* user);
     void UserDisconnected(USER *usr);
 
 signals :

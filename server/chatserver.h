@@ -29,7 +29,7 @@ protected :
     void incomingConnection(qintptr socketDescriptor) override;
 
 signals:
-    void ProcessData(QByteArray data);
+    void ProcessData(QByteArray data, USER* user);
     void AddUser(USER* user);
     void DisconnectUser(USER *user);
 

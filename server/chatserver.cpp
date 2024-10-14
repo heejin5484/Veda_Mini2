@@ -54,7 +54,7 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
                 connect(clientSocket, &QTcpSocket::readyRead, [=](){
                     QByteArray data = clientSocket->readAll();
                     // 수신한 데이터 처리
-                    emit ProcessData(data);
+                    emit ProcessData(data, user);
                     qDebug() << "Received data:" << data;
                 });
             } else {

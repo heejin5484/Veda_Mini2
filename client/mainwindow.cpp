@@ -11,8 +11,6 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    //나중에 id 입력 구현
-    id = "test";
 
     ui->setupUi(this);
     clientSocket = new QTcpSocket(this);
@@ -27,8 +25,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_connectButton_clicked()
 {
+    // 나중에 로그인 구현
+    id = ui->ID_Edit->text();
     ui->status_label->setText("Connecting...");
-    // 여기 포트번호 바꿔서 테스트
     tryConnect("127.0.0.1", 8080);
 }
 

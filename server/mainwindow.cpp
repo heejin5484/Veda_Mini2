@@ -7,6 +7,9 @@
 #include "chatserver.h"
 #include "chatroom.h"
 #include "ui_chatroom.h"
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -49,8 +52,31 @@ void MainWindow::UserConnected(USER* usr){
     emit NewUserAdd(usr->ID);
 }
 
-void MainWindow::DataIncome(QByteArray data){
-    qDebug() << "Data Incoming";
+void MainWindow::DataIncome(QByteArray data, USER *user){
+    qDebug() << "Data Incoming from user:" << user->ID;
+
+    // JSON 형식으로 데이터 파싱 (msg 타입 여부 확인)
+    //QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
+    //QJsonObject jsonObj = jsonDoc.object();
+
+    //QString type = jsonObj["type"].toString();  // 데이터 타입 확인
+    //QString msg = jsonObj["message"].toString();  // 메시지 내용
+
+    //if (type == "msg") {
+        // 보낸 사용자를 제외한 모든 사용자에게 메시지 전달
+        for (auto otherUser : UserMap) {
+            if (otherUser != user) {  // 보낸 사용자 제외
+                if (otherUser->usersocket) {
+                    // 다른 사용자에게 메시지 전송
+                    otherUser->usersocket->write(data);
+                    otherUser->usersocket->flush();  // 버퍼에 쌓인 데이터를 즉시 전송
+                }
+            }
+        }
+    //} else {
+    //    qDebug() << "Unhandled data type: " << type;
+    //}
+
 }
 
 void MainWindow::UserDisconnected(USER *usr){
@@ -65,5 +91,4 @@ void MainWindow::UserDisconnected(USER *usr){
     }
     delete usr;
     qDebug() << "User object deleted";
-
 }
