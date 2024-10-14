@@ -10,10 +10,15 @@
 class databaseManager
 {
 public:
+    static databaseManager& getInstance(const QString& dbName = "logs.db") {
+            static databaseManager instance(dbName);
+            return instance;
+        }
+
     databaseManager(const QString& dbName);
     ~databaseManager();
     bool init();
-    bool saveMessage(const QString& message);
+    bool saveMessage(const QString &message);
 
 private:
     QSqlDatabase db;

@@ -1,6 +1,6 @@
 QT       += core gui sql
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network
 
 CONFIG += c++17
 
@@ -14,19 +14,33 @@ SOURCES += \
     thread.cpp \
     databasemanager.cpp \
     logwindow.cpp \
-    logviewer.cpp
+    logviewer.cpp \
+    loginwindow.cpp \
+    chatwindow.cpp \
+    searchwindow.cpp \
+    networkmanager.cpp \
+    joinwindow.cpp
 
 HEADERS += \
     mainwindow.h \
     thread.h \
     databasemanager.h \
     logwindow.h \
-    logviewer.h
+    logviewer.h \
+    loginwindow.h \
+    chatwindow.h \
+    searchwindow.h \
+    networkmanager.h \
+    joinwindow.h
 
 FORMS += \
     mainwindow.ui \
     logwindow.ui \
-    logviewer.ui
+    logviewer.ui \
+    loginwindow.ui \
+    chatwindow.ui \
+    searchwindow.ui \
+    joinwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

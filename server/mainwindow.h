@@ -40,5 +40,6 @@ private:
     chatRoom *chatroom;
     void ServerOpen(int address);
     QMap<QString, USER*> UserMap;
+
 };
 #endif // MAINWINDOW_H

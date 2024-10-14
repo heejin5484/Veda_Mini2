@@ -33,6 +33,8 @@ private slots:
 
     void on_idButton_3_clicked();
 
+    void on_startButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QQueue<QString> msgqueue;

@@ -39,24 +39,16 @@ bool databaseManager::init()
 }
 
 bool databaseManager::saveMessage(const QString &message) {
-    if (!db.isOpen()) {
-        qDebug() << "Database is not open.";
-        return false;
-    }
-
     QSqlQuery query;
-    QString dateTime = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
-    query.prepare("INSERT INTO log_messages (timestamp, message) VALUES (?, ?)");
-    query.addBindValue(dateTime);
-    query.addBindValue(message);
+    query.prepare("INSERT INTO log_messages (message, timestamp) VALUES (:message, CURRENT_TIMESTAMP)");
+    query.bindValue(":message", message);
 
     if (!query.exec()) {
-        qDebug() << "Failed to insert message: " << query.lastError().text();
+        qDebug() << "Failed to save message to database: " << query.lastError().text();
         return false;
     }
-    else {
-        qDebug() << "Message saved to DB: " << message;
-        return true;
-    }
+    return true;
 }
+
+
 

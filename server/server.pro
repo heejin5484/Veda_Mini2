@@ -1,10 +1,10 @@
 QT       += core gui network
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network
 
 CONFIG += c++17
 
-# ½ÇÇà ÆÄÀÏ ÀÌ¸§ ¼³Á¤
+# Â½Ã‡Ã‡Ã  Ã†Ã„Ã€Ã Ã€ÃŒÂ¸Â§ Â¼Â³ÃÂ¤
 TARGET = Server
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -15,7 +15,8 @@ SOURCES += \
     chatroom.cpp \
     chatserver.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    chatserver.cpp
 
 HEADERS += \
     chatroom.h \

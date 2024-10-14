@@ -15,8 +15,10 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , server(new ChatServer(this))
 {
     ui->setupUi(this);
+    startServer();
 }
 
 MainWindow::~MainWindow()

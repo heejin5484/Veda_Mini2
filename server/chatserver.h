@@ -1,5 +1,7 @@
 #ifndef CHATSERVER_H
 #define CHATSERVER_H
+
+
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QCoreApplication>
@@ -7,6 +9,11 @@
 #include <QList>
 #include <QMap>
 #include <QPair>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QDebug>
+#include <QFileDialog>
+#include <QFile>
 
 class MainWindow;
 
@@ -25,6 +32,13 @@ class ChatServer : public QTcpServer
 public:
     ChatServer(QObject *parent = nullptr);
 
+
+/*
+private slots:
+    void onNewConnection();
+    void processMessage(const QByteArray &data, QTcpSocket *socket);
+    void sendResponse(QTcpSocket *socket, const QJsonObject &response);
+*/
 protected :
     void incomingConnection(qintptr socketDescriptor) override;
 
