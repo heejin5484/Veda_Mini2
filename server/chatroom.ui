@@ -22,25 +22,6 @@
      <height>231</height>
     </rect>
    </property>
-   <item>
-    <property name="text">
-     <string>ID</string>
-    </property>
-    <property name="statusTip">
-     <string notr="true"/>
-    </property>
-    <property name="icon">
-     <iconset theme="QIcon::ThemeIcon::CameraWeb"/>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>ID2</string>
-    </property>
-    <property name="icon">
-     <iconset theme="QIcon::ThemeIcon::CameraWeb"/>
-    </property>
-   </item>
   </widget>
   <widget class="QTextEdit" name="textEdit">
    <property name="geometry">
