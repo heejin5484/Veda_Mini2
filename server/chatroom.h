@@ -7,6 +7,7 @@
 class QMediaCaptureSession;
 class QCamera;
 class QImageCapture;
+class ChatServer;
 
 namespace Ui {
 class chatRoom;
@@ -17,7 +18,7 @@ class chatRoom : public QWidget
     Q_OBJECT
 
 public:
-    explicit chatRoom(QWidget *parent = nullptr);
+    explicit chatRoom(QWidget *parent = nullptr, ChatServer *server = nullptr);
     ~chatRoom();
 
 public slots:
@@ -32,6 +33,8 @@ private:
     QCamera* camera;
     QImageCapture* imageCapture;
     QMediaCaptureSession* captureSession;
+    ChatServer *chatserver;
+
 
     QImage capturedImage;
 };

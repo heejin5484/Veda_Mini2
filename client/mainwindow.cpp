@@ -87,6 +87,35 @@ void MainWindow::sendMsg(QString msg)
 void MainWindow::readMsg()
 {
     // 나중에 여기 split해서 파싱한 문자에따라 다르게 동작하게끔 switch문/signal 구현
-    QByteArray bytearray = clientSocket->read(BLOCK_SIZE);
-    emit deliverMsg(bytearray);
+    //QByteArray bytearray = clientSocket->read(BLOCK_SIZE);
+    //emit deliverMsg(bytearray);
+    static QByteArray buffer;
+    static int expectedSize = -1;
+
+    QDataStream in(clientSocket);
+    in.setVersion(QDataStream::Qt_5_15);
+
+    if (expectedSize == -1) {
+        // 이미지 크기를 먼저 수신
+        if (clientSocket->bytesAvailable() < sizeof(int)) {
+            return;  // 이미지 크기를 받을 만큼 데이터가 없으면 리턴
+        }
+        in >> expectedSize;  // 이미지 크기 수신
+    }
+
+    // 이미지 데이터를 수신
+    if (clientSocket->bytesAvailable() < expectedSize) {
+        return;  // 모든 데이터를 받을 때까지 대기
+    }
+
+    buffer.append(clientSocket->read(expectedSize));  // 데이터 읽기
+
+    if (buffer.size() == expectedSize) {
+        // 이미지가 완전히 수신된 경우
+        emit deliverMsg(buffer);  // 완성된 이미지를 처리하도록 신호 전송
+
+        // 초기화
+        expectedSize = -1;
+        buffer.clear();
+    }
 }

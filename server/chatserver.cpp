@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QDir>
+#include <QBuffer>
 
 ChatServer::ChatServer(QObject *parent)
     : QTcpServer(parent), mainwindow(nullptr)
@@ -90,6 +91,32 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
 
     thread->start();
     qDebug() << "init thread";
+}
+
+void ChatServer::onImageCaptured(int id, const QImage &image) {
+    qDebug() << "send";
+    Q_UNUSED(id);
+    // QImage를 QTcpSocket을 통해 클라이언트로 전송하는 로직 작성
+    QByteArray byteArray;
+    QBuffer buffer(&byteArray);
+    buffer.open(QIODevice::WriteOnly);
+    image.save(&buffer, "JPEG", 50);  // QImage를 JPEG로, 압축품질 50
+
+    // 이미지 크기를 전송
+    int imageSize = byteArray.size();
+
+    foreach(QTcpSocket* client, clientMap.keys()) {
+        QDataStream out(client);
+        out.setVersion(QDataStream::Qt_5_15);
+
+        // 이미지 크기 먼저 전송
+        out << imageSize;
+
+        // 실제 이미지 데이터 전송
+        out.writeRawData(byteArray.data(), byteArray.size());
+
+        client->flush();  // 데이터를 즉시 전송
+    }
 }
 
 /*

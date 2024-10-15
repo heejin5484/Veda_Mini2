@@ -38,7 +38,7 @@ private:
     Ui::MainWindow *ui;
     void LoginSuccess();
     chatRoom *chatroom;
-    void ServerOpen(int address);
+    bool ServerOpen(int address);
     QMap<QString, USER*> UserMap;
 
 };

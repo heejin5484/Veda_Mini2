@@ -24,6 +24,7 @@ signals :
 private slots:
     void onSendButtonClicked();
     void recieveMsg(QByteArray msg);
+    void recieveVideo(QByteArray msg);
 };
 
 #endif // CHAT_H

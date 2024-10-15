@@ -32,7 +32,8 @@ class ChatServer : public QTcpServer
 public:
     ChatServer(QObject *parent = nullptr);
 
-
+public slots:
+    void onImageCaptured(int id, const QImage &image);
 /*
 private slots:
     void onNewConnection();

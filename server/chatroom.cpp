@@ -10,12 +10,13 @@
 #include <QMediaCaptureSession>
 #include <QTimer>
 
-chatRoom::chatRoom(QWidget *parent)
+chatRoom::chatRoom(QWidget *parent, ChatServer *server)
     : QWidget(parent)
     , ui(new Ui::chatRoom)
     , camera(nullptr)
     , imageCapture(nullptr)
     , captureSession(new QMediaCaptureSession)
+    , chatserver(server)
 {
     ui->setupUi(this);
     //ui->cameraView->setMinimumSize(640, 480);
@@ -42,6 +43,8 @@ chatRoom::chatRoom(QWidget *parent)
 
     // 이미지 캡처 후 화면에 그리기
     connect(imageCapture, &QImageCapture::imageCaptured, this, &chatRoom::onImageCaptured);
+    // 이미지 캡쳐 후 서버에 그리기
+    connect(imageCapture, &QImageCapture::imageCaptured, chatserver, &ChatServer::onImageCaptured);
 
     ui->userList->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->userList, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showContextMenu(QPoint)));
@@ -71,9 +74,32 @@ void chatRoom::onImageCaptured(int id, const QImage &image)
     qDebug() << "Image Captured:" << !image.isNull();
 
     if (!image.isNull()) {
-        // 캡처된 이미지를 QLabel에 맞게 크기 조정하여 설정
-        QPixmap pixmap = QPixmap::fromImage(image).scaled(ui->cameraView->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        ui->cameraView->setPixmap(pixmap);  // QLabel에 Pixmap 설정
+        // QLabel의 크기
+        QSize labelSize = ui->cameraView->size();
+
+        // 이미지의 크기
+        QSize imageSize = image.size();
+
+        // 이미지와 QLabel의 종횡비 비교
+        QRect targetRect;
+        if (static_cast<float>(imageSize.width()) / imageSize.height() > static_cast<float>(labelSize.width()) / labelSize.height()) {
+            // 이미지가 가로로 더 길면 좌우를 잘라냄
+            int newWidth = static_cast<int>(imageSize.height() * static_cast<float>(labelSize.width()) / labelSize.height());
+            int xOffset = (imageSize.width() - newWidth) / 2;
+            targetRect = QRect(xOffset, 0, newWidth, imageSize.height());
+        } else {
+            // 이미지가 세로로 더 길면 위아래를 잘라냄
+            int newHeight = static_cast<int>(imageSize.width() * static_cast<float>(labelSize.height()) / labelSize.width());
+            int yOffset = (imageSize.height() - newHeight) / 2;
+            targetRect = QRect(0, yOffset, imageSize.width(), newHeight);
+        }
+
+        // 이미지를 잘라냄
+        QImage croppedImage = image.copy(targetRect);
+
+        // 잘린 이미지를 QLabel 크기에 맞게 설정
+        QPixmap pixmap = QPixmap::fromImage(croppedImage).scaled(labelSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+        ui->cameraView->setPixmap(pixmap);
     }
 }
 
