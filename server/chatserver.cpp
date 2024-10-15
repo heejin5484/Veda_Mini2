@@ -11,8 +11,6 @@ ChatServer::ChatServer(QObject *parent)
 {
     mainwindow = static_cast<MainWindow*>(parent);
 
-    // 나중에 스레드풀같은거 생각해보기
-
     // mainwindow와 연결
     connect(this, &ChatServer::AddUser, mainwindow, &MainWindow::UserConnected, Qt::UniqueConnection);
     connect(this, &ChatServer::ProcessData, mainwindow, &MainWindow::DataIncome);
@@ -96,7 +94,8 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
 void ChatServer::onImageCaptured(int id, const QImage &image) {
     qDebug() << "send";
     Q_UNUSED(id);
-    // QImage를 QTcpSocket을 통해 클라이언트로 전송하는 로직 작성
+
+    // QImage -> JPEG
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
     buffer.open(QIODevice::WriteOnly);

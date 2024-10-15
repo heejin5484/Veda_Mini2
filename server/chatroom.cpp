@@ -2,49 +2,36 @@
 #include "ui_chatroom.h"
 #include <QMenu>
 #include <QCamera>
-#include <QMediaCaptureSession>
-#include <QMediaDevices>
-#include <QImageCapture>
+#include "camerathread.h"
+
 #include <QPainter>
 #include <QImage>
+#include <QCamera>
 #include <QMediaCaptureSession>
-#include <QTimer>
+#include <QImageCapture>
+#include <QMediaDevices>
 
 chatRoom::chatRoom(QWidget *parent, ChatServer *server)
     : QWidget(parent)
     , ui(new Ui::chatRoom)
-    , camera(nullptr)
-    , imageCapture(nullptr)
-    , captureSession(new QMediaCaptureSession)
     , chatserver(server)
 {
     ui->setupUi(this);
-    //ui->cameraView->setMinimumSize(640, 480);
 
-    // 카메라 장치 설정
-    camera = new QCamera(QMediaDevices::defaultVideoInput(), this);
+    // 카메라 및 캡처 객체는 메인 스레드에서 생성
+    QCamera *camera = new QCamera(QMediaDevices::defaultVideoInput(), this);
+    QImageCapture *imageCapture = new QImageCapture(this);
 
-    // 미디어 캡처 세션 설정
+    QMediaCaptureSession *captureSession = new QMediaCaptureSession();
     captureSession->setCamera(camera);
-
-    // 이미지 캡처 객체 설정
-    imageCapture = new QImageCapture(this);
     captureSession->setImageCapture(imageCapture);
 
-    // 카메라 시작
-    qDebug() << "Starting camera...";
-    camera->start();
-
-    // 주기적으로 이미지 캡쳐
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &chatRoom::captureImage);
-    timer->start(100);  // 0.1초(100ms) 간격으로 이미지 캡처
-
-
-    // 이미지 캡처 후 화면에 그리기
+    // 스레드 생성 및 실행
+    CameraThread *cameraThread = new CameraThread(camera, imageCapture, this);
     connect(imageCapture, &QImageCapture::imageCaptured, this, &chatRoom::onImageCaptured);
-    // 이미지 캡쳐 후 서버에 그리기
     connect(imageCapture, &QImageCapture::imageCaptured, chatserver, &ChatServer::onImageCaptured);
+
+    cameraThread->start();  // 스레드 시작
 
     ui->userList->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->userList, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showContextMenu(QPoint)));
@@ -53,20 +40,8 @@ chatRoom::chatRoom(QWidget *parent, ChatServer *server)
 chatRoom::~chatRoom()
 {
     delete ui;
-    delete camera;
-    delete imageCapture;
-    delete captureSession;
 }
 
-void chatRoom::captureImage()
-{
-    if (imageCapture->isReadyForCapture()) {
-        qDebug() << "Capturing image...";
-        imageCapture->capture();  // 이미지를 캡처
-    } else {
-        qDebug() << "Image capture is not ready.";
-    }
-}
 
 void chatRoom::onImageCaptured(int id, const QImage &image)
 {
