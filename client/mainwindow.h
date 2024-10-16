@@ -23,8 +23,8 @@ public:
     ~MainWindow();
     QTcpSocket *clientSocket;
     QString id;
-
     void sendMsg(QString msg);
+    void setConnectButtonEnabled(bool enabled);
 
 private slots:
 

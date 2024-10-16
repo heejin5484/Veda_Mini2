@@ -1,6 +1,9 @@
 #include "loginwindow.h"
 #include "ui_loginwindow.h"
+#include "mainwindow.h"
 #include <QMessageBox>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 LoginWindow::LoginWindow(NetworkManager *networkManager, QWidget *parent) :
     QDialog(parent),
@@ -8,6 +11,8 @@ LoginWindow::LoginWindow(NetworkManager *networkManager, QWidget *parent) :
     networkManager(networkManager)
 {
     ui->setupUi(this);
+    connect(networkManager, &NetworkManager::responseReceived, this, &LoginWindow::handleServerResponse);
+
 }
 
 LoginWindow::~LoginWindow()
@@ -32,7 +37,19 @@ void LoginWindow::on_LoginButton_clicked()
         json["password"] = password; // 비밀번호
 
         // 네트워크 매니저를 통해 서버에 로그인 요청 전송
-        networkManager->sendMessage(json);
+        networkManager->sendMessage(json); 
 
 }
 
+void LoginWindow::handleServerResponse(bool success, const QString &message) {
+    if (success) {
+        QMessageBox::information(this, "로그인 성공", message);
+        MainWindow *mainWindow = static_cast<MainWindow*>(parent()); // MainWindow를 가져옴
+                if (mainWindow) {
+                    mainWindow->setConnectButtonEnabled(true);
+                }
+        accept(); // 로그인 성공 시 창 닫기
+    } else {
+        QMessageBox::warning(this, "로그인 실패", message);
+    }
+}

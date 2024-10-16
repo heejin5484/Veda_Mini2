@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     //connect(clientSocket, &QTcpSocket::errorOccurred, this, &MainWindow::failedConnect);
     connect(clientSocket, &QTcpSocket::connected, this, &MainWindow::onConnected);
     connect(ui->JoinButton, &QPushButton::clicked, this, &MainWindow::on_JoinButton_clicked);
+    setConnectButtonEnabled(false);
 
 }
 
@@ -35,6 +36,10 @@ void MainWindow::on_connectButton_clicked()
     id = ui->ID_Edit->text();
     ui->status_label->setText("Connecting...");
     tryConnect("127.0.0.1", 8771);
+}
+
+void MainWindow::setConnectButtonEnabled(bool enabled) {
+    ui->connectButton->setEnabled(enabled);
 }
 
 void MainWindow::tryConnect(QString ip, int port){

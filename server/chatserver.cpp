@@ -72,20 +72,22 @@ void ChatServer::processSignupRequest(const QJsonObject &jsonObj, QTcpSocket *cl
     QString phone = jsonObj["phone"].toString();
     QString email = jsonObj["email"].toString();
 
-    if (!userid.isEmpty()) {
+    if (!userid.isEmpty())
+    {
         USER *user = new USER; // USER 구조체 인스턴스 생성
         user->ID = userid;
         user->PW = password;
         user->name = name;
         user->usersocket = clientSocket;
 
-        emit AddUser(user); // AddUser 시그널 발생
+        //emit AddUser(user); // AddUser 시그널 발생
 
         DatabaseManager dbManager("users.db"); // 여기서 데이터베이스 매니저를 새로 생성
         if (!dbManager.init()) {
             sendResponse(clientSocket, "error", "데이터베이스 초기화 실패.");
             return; // 초기화 실패 시 응답 후 종료
         }
+
 
         bool saveSuccess = dbManager.saveUserData(name, phone, email, userid, password, "J");
         if (saveSuccess) {
@@ -95,10 +97,18 @@ void ChatServer::processSignupRequest(const QJsonObject &jsonObj, QTcpSocket *cl
             qDebug() << "사용자 데이터 저장 실패.";
             sendResponse(clientSocket, "error", "가입에 실패했습니다.");
         }
-    } else {
+
+        dbManager.close(); // 연결 종료
+        delete user;
+
+    }
+    else
+    {
         qDebug() << "잘못된 사용자 ID 수신";
         clientSocket->disconnectFromHost();
     }
+
+
 }
 
 void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *clientSocket) {
@@ -107,17 +117,15 @@ void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *cli
 
     qDebug() << "로그인 요청 수신: " << userid;
 
-    // 데이터베이스 경로를 명확하게 설정
-    DatabaseManager dbManager("/home/seyeung/Veda_Mini2/build-server-Desktop_Qt_5_12_12_GCC_64bit-Debug/users.db");
+    DatabaseManager dbManager("users.db"); // 데이터베이스 매니저 인스턴스 생성
 
-    // 데이터베이스 초기화
     if (!dbManager.init()) {
         sendResponse(clientSocket, "error", "데이터베이스 초기화 실패.");
         return; // 초기화 실패 시 응답 후 종료
     }
 
-    QSqlQuery query;
-    // 쿼리 준비 및 바인딩
+    // 쿼리 실행
+    QSqlQuery query(dbManager.database()); // DatabaseManager에서 db를 가져옵니다.
     query.prepare("SELECT password FROM users WHERE userid = :userid");
     query.bindValue(":userid", userid);
 
@@ -129,16 +137,27 @@ void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *cli
 
     if (query.next()) {
         QString storedPassword = query.value(0).toString(); // 데이터베이스에서 비밀번호 가져오기
+        qDebug() << "Stored password:" << storedPassword;
 
-        // 비밀번호 확인
         if (storedPassword == password) {
+            // 로그인 성공 시 USER 구조체 인스턴스 생성
+            USER *user = new USER;
+            user->ID = userid; // 사용자 ID 설정
+            user->PW = password; // 비밀번호 설정
+            user->usersocket = clientSocket; // 클라이언트 소켓 설정
+
+            emit AddUser(user); // 로그인 성공 시 AddUser 시그널 발생
             sendResponse(clientSocket, "success", "로그인 성공");
-        } else {
-            sendResponse(clientSocket, "error", "비밀번호가 틀렸습니다.");
         }
-    } else {
+        else {
+            sendResponse(clientSocket, "fail", "비밀번호가 틀렸습니다.");
+        }
+    }
+    else {
         sendResponse(clientSocket, "error", "가입되지 않은 사용자입니다.");
     }
+
+    dbManager.close(); // 연결 종료
 }
 
 

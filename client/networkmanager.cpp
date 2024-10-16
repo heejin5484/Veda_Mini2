@@ -59,6 +59,6 @@ void NetworkManager::onReadyRead() {
         bool success = jsonObj["status"] == "success";
         QString message = jsonObj["message"].toString();
 
-        emit signupResponse(success, message); // 회원가입 응답 시그널 전송
+        emit responseReceived(success, message); // 회원가입 응답 시그널 전송
     }
 }

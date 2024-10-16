@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include "networkmanager.h"
 
+
 namespace Ui {
 class LoginWindow;
 }
@@ -23,6 +24,7 @@ private slots:
 private:
     Ui::LoginWindow *ui;
     NetworkManager *networkManager;
+    void handleServerResponse(bool success, const QString &message);
 };
 
 #endif // LOGINWINDOW_H

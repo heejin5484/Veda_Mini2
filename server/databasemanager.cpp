@@ -1,6 +1,9 @@
 #include "databasemanager.h"
 #include <QDir>
 #include <QThread>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QDebug>
 
 DatabaseManager::DatabaseManager(const QString &dbName) {
     // SQLite 드라이버 로드
@@ -11,19 +14,39 @@ DatabaseManager::DatabaseManager(const QString &dbName) {
 
     QString connectionName = QString("connection_%1").arg(reinterpret_cast<quintptr>(QThread::currentThread()));
     db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
-    db.setDatabaseName(QDir::cleanPath(QDir::currentPath() + "/" + dbName)); // 깨끗한 경로 설정
+
+    // 절대 경로로 데이터베이스 파일 설정
+    QString dbPath = dbName;
+    db.setDatabaseName(dbPath);
 
     qDebug() << "Database path set to:" << db.databaseName();
+
+    // 데이터베이스 파일이 없다면 생성
+       if (!QFile::exists(dbPath)) {
+           QFile file(dbPath);
+           if (!file.open(QIODevice::ReadWrite)) {
+               qDebug() << "Failed to create database file:" << file.errorString();
+               return;
+           }
+           file.close();
+       }
+
+       // 데이터베이스 초기화
+       if (!init()) {
+           qDebug() << "Database initialization failed.";
+       }
 }
 
 bool DatabaseManager::init() {
+    // 데이터베이스 열기
     if (!db.open()) {
-        qDebug() << "Database error:" << db.lastError().text();
+        qDebug() << "Database not opened:" << db.lastError().text();
         return false;
     }
 
     qDebug() << "Database opened successfully";
 
+    // 테이블 생성 쿼리
     QSqlQuery query(db);
     if (!query.exec("CREATE TABLE IF NOT EXISTS users ("
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -41,7 +64,14 @@ bool DatabaseManager::init() {
 }
 
 
-bool DatabaseManager::saveUserData(const QString& name, const QString& phone, const QString& email, const QString& userid, const QString& password, const QString& type) {
+bool DatabaseManager::saveUserData(const QString& name, const QString& phone, const QString& email, const QString& userid, const QString& password, const QString& type)
+{
+
+    if (!db.isOpen()) {
+            qDebug() << "Database is not open.";
+            return false;
+    }
+
     QSqlQuery query(db);  // 로컬 쿼리 생성
     query.prepare("INSERT INTO users (name, phone, email, userid, password, type) VALUES (?, ?, ?, ?, ?, ?)");
 
@@ -72,18 +102,28 @@ QSqlQuery DatabaseManager::loadUsers() {
 }
 
 
-
 // 메시지 데이터를 로드하는 함수
 QSqlQuery DatabaseManager::loadMessages() {
     QSqlQuery query(db);
-    query.exec("SELECT messages.message, users.userid, messages.timestamp FROM messages JOIN users ON messages.user_id = users.id");
+    if (!query.exec("SELECT messages.message, users.userid, messages.timestamp FROM messages JOIN users ON messages.user_id = users.id")) {
+        qDebug() << "Message loading error:" << query.lastError().text();  // 오류 메시지 출력
+    }
     return query;  // 쿼리 결과 반환
 }
 
+// 추가된 멤버 함수
+QSqlDatabase DatabaseManager::database() const {
+    return db;  // 데이터베이스 객체를 반환
+}
 
 DatabaseManager::~DatabaseManager() {
+    close(); // 데이터베이스 닫기
+}
+
+void DatabaseManager::close() {
     if (db.isOpen()) {
         db.close();
+        qDebug() << "Database connection closed.";
     }
-    QSqlDatabase::removeDatabase(db.connectionName());
+    //QSqlDatabase::removeDatabase(db.connectionName()); // 연결 이름을 사용하여 제거
 }

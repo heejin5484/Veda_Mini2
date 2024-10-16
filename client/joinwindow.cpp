@@ -7,7 +7,7 @@ JoinWindow::JoinWindow(NetworkManager *networkManager, QWidget *parent) :
     networkManager(networkManager)
 {
     ui->setupUi(this);
-    connect(networkManager, &NetworkManager::signupResponse, this, &JoinWindow::on_signupResponse);
+    connect(networkManager, &NetworkManager::responseReceived, this, &JoinWindow::on_signupResponse);
 }
 
 JoinWindow::~JoinWindow()

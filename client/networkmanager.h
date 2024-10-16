@@ -13,7 +13,7 @@ public:
     void sendMessage(const QJsonObject &json);
 
 signals:
-    void signupResponse(bool success, const QString &message); // 성공 여부와 메시지를 전달
+    void responseReceived(bool success, const QString &response); // 성공 여부와 메시지를 전달
 
 private:
     QTcpSocket *socket;
