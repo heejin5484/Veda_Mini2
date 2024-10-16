@@ -11,7 +11,8 @@ DatabaseManager::DatabaseManager(const QString &dbName) {
 
     QString connectionName = QString("connection_%1").arg(reinterpret_cast<quintptr>(QThread::currentThread()));
     db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
-    db.setDatabaseName(QDir::currentPath() + "/" + dbName); // 파일 경로를 설정
+    db.setDatabaseName(QDir::cleanPath(QDir::currentPath() + "/" + dbName)); // 깨끗한 경로 설정
+
     qDebug() << "Database path set to:" << db.databaseName();
 }
 
