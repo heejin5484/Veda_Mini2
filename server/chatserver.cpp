@@ -35,11 +35,13 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
 
     clientThread->setSocket(clientSocket); // 소켓을 스레드에 전달
 
+    clientThread->start();
+
     connect(clientThread, &ClientThread::finished, clientThread, &QObject::deleteLater);
     // clientThread에서 유저 정보를 받을 수 있게 신호 연결
-    connect(this, &ChatServer::sendImageToClient, clientThread, &ClientThread::sendImage);
+    connect(this, &ChatServer::sendImageToClient, static_cast<ClientThread*>(clientThread), &ClientThread::sendImagefromServer);
 
-    clientThread->start();
+
 }
 
 
@@ -70,7 +72,6 @@ void ChatServer::removeClient(ClientThread* clientThread) {
 }
 
 void ChatServer::onImageCaptured(int id, const QImage &image) {
-    qDebug() << "send";
     Q_UNUSED(id);
 
     // QImage -> JPEG
@@ -113,13 +114,36 @@ void ChatServer::broadcastMessage(){
 void ChatServer::broadcastImage(){
     QMutexLocker locker(&imageMutex);  // 큐 동기화
 
-    // 큐에 데이터가 있으면 클라이언트로 전송
-    while (!imageQueue.isEmpty()) {
-        QByteArray byteArray = imageQueue.dequeue();  // 큐에서 이미지 가져오기
+    if (clientMap.isEmpty()) {
+        //qDebug() << "No clients connected, skipping broadcast.";
+        imageQueue.clear();  // 클라이언트가 없으면 큐를 비움
+        return;  // 클라이언트가 없으면 그냥 리턴
+    }
 
-        // 각 ClientThread에 이미지를 전송하도록 신호 보냄
-        emit sendImageToClient(byteArray);  // 이미지 데이터를 모든 스레드로 전송
+    qDebug() << "Clients connected: " << clientMap.size();
 
+    // 각 클라이언트의 스레드 상태를 체크하고 이미지 전송
+    foreach (ClientThread* clientThread, clientMap.keys()) {
+        if (!clientThread->isRunning()) {
+            qDebug() << "Client thread is not running, skipping...";
+            continue;
+        }
+        qDebug() << " ==============";
+        qDebug() << clientThread->thread();
+        qDebug() << clientThread->currentThread();
+        qDebug() << "===============";
+
+        // 이미지 큐에서 이미지를 가져옴
+        while (!imageQueue.isEmpty()) {
+            QByteArray byteArray = imageQueue.dequeue();  // 큐에서 이미지 가져오기
+
+            // 이미지 전송 신호를 스레드로 보냄 이렇게하니까오류났음
+            emit sendImageToClient(byteArray);  // 이미지를 스레드로 전송
+            //QMetaObject::invokeMethod(clientThread, "sendImage", Qt::QueuedConnection, Q_ARG(QByteArray, byteArray));
+            // QMetaObject::invokeMethod로 해당 클라이언트 스레드에서 sendImage 호출
+
+            qDebug() << "Image sent to clients.";
+        }
     }
 }
 

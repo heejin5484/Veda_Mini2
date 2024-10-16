@@ -7,6 +7,7 @@
 
 class ClientThread : public QThread
 {
+    Q_OBJECT
 public:
     explicit ClientThread(qintptr socketDescriptor, QObject *parent = nullptr);
     ~ClientThread();
@@ -22,6 +23,7 @@ private slots:
 
 signals:
     void ProcessData(QByteArray data, USER* user);
+    void sendImagefromServer(const QByteArray& image); // 시그널-슬롯간 스레드 불일치로 인한 오류 해결용
 
 private:
     QTcpSocket *clientSocket;  // 클라이언트 소켓

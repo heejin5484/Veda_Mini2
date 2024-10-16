@@ -45,7 +45,6 @@ chatRoom::~chatRoom()
 
 void chatRoom::onImageCaptured(int id, const QImage &image)
 {
-    qDebug() << "here";
     Q_UNUSED(id);
     qDebug() << "Image Captured:" << !image.isNull();
 
@@ -77,7 +76,6 @@ void chatRoom::onImageCaptured(int id, const QImage &image)
         QPixmap pixmap = QPixmap::fromImage(croppedImage).scaled(labelSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
         ui->cameraView->setPixmap(pixmap);
     }
-    qDebug() << "..";
 }
 
 void chatRoom::showContextMenu(const QPoint &pos) {

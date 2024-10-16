@@ -5,10 +5,11 @@
 #include "chatserver.h"
 
 ClientThread::ClientThread(qintptr socketDescriptor, QObject *parent)
-    : QThread(parent), socketDescriptor(socketDescriptor), clientSocket(nullptr), isUserAuthenticated(false) {}
+    : QThread(parent), socketDescriptor(socketDescriptor), clientSocket(nullptr), isUserAuthenticated(false) {moveToThread(this);}
 
 
 ClientThread::~ClientThread() {
+
 
     // delete user; 찾아보기 여기서 삭제하는게 적절한지..
 }
@@ -20,13 +21,22 @@ void ClientThread::run() {
         return;
     }
 
+    qDebug() << "clientSocket is in thread:" << clientSocket->thread();
+    qDebug() << "Current thread:" << this->thread();
     qDebug() << "..";
     // 스레드로 소켓을 이동
     clientSocket->moveToThread(this);
-    qDebug() << "here";
+    qDebug() << "here^____^";
     // 소켓 이벤트 연결
     connect(clientSocket, &QTcpSocket::readyRead, this, &ClientThread::onReadyRead);
     connect(clientSocket, &QTcpSocket::disconnected, this, &ClientThread::onDisconnected);
+
+    // 서버의 카메라이미지 준비신호와 연결
+    //connect(static_cast<ChatServer*>(parent()), &ChatServer::sendImageToClient, this, &ClientThread::sendImage);
+    connect(this, &ClientThread::sendImagefromServer, this, &ClientThread::sendImage);
+
+    qDebug() << "clientSocket is in thread:" << clientSocket->thread();
+    qDebug() << "Current thread:" << QThread::currentThread();
 
     exec();  // 스레드 이벤트 루프 실행
 }
@@ -92,13 +102,25 @@ void ClientThread::onDisconnected() {
     }
 }
 
+
 void ClientThread::sendImage(const QByteArray& image) {
+    qDebug() << "----------------------------";
+    qDebug() << "clientSocket is in thread:" << clientSocket->thread();
+    qDebug() << "Current thread:" << QThread::currentThread();
     if (clientSocket && clientSocket->state() == QAbstractSocket::ConnectedState) {
         QDataStream out(clientSocket);
         out.setVersion(QDataStream::Qt_5_15);
         int imageSize = image.size();
         out << imageSize;  // 이미지 크기 전송
-        out.writeRawData(image.data(), image.size());  // 이미지 데이터 전송
+        out.writeRawData(image.data(), imageSize);  // 이미지 데이터 전송
         clientSocket->flush();  // 즉시 전송
+        clientSocket->waitForBytesWritten();  // 데이터가 전송될 때까지 대기
+
+        if (clientSocket->error() != QAbstractSocket::UnknownSocketError) {
+            qDebug() << "Socket error:" << clientSocket->errorString();
+        }
+       // 다른 스레드에서 안전하게 실행
+    } else {
+    qDebug() << "Socket is not connected or invalid";
     }
 }
