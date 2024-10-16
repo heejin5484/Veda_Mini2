@@ -5,6 +5,7 @@
 #include <QJsonValue>
 #include <QDir>
 #include <QBuffer>
+#include "clientthread.h"
 
 ChatServer::ChatServer(QObject *parent)
     : QTcpServer(parent), mainwindow(nullptr)
@@ -18,77 +19,54 @@ ChatServer::ChatServer(QObject *parent)
 }
 
 void ChatServer::incomingConnection(qintptr socketDescriptor) {
-    QTcpSocket *clientSocket = new QTcpSocket;
-    clientSocket->setSocketDescriptor(socketDescriptor);
 
-    QThread *thread = new QThread;
-    clientSocket->moveToThread(thread); // 소켓을 새 스레드로 이동
+    // 소켓을 메인 스레드에서 생성
+    QTcpSocket* clientSocket = new QTcpSocket();
+    if (!clientSocket->setSocketDescriptor(socketDescriptor)) {
+        qDebug() << "Error: Could not set socket descriptor";
+        delete clientSocket;
+        return;
+    }
 
-    USER *user = new USER{"", "", "", clientSocket};
+    // 새로운 스레드를 생성
+    ClientThread* clientThread = new ClientThread(socketDescriptor, this);
+    // 소켓을 스레드로 이동
+    clientSocket->moveToThread(clientThread);
 
-    threadList.append(thread);
-    clientMap.insert(clientSocket, user);
+    clientThread->setSocket(clientSocket); // 소켓을 스레드에 전달
 
-    // 스레드 시작되면 데이터 송수신 처리
-    connect(thread, &QThread::started, clientSocket, [=](){
-        qDebug() << "Client connected in new thread";
+    connect(clientThread, &ClientThread::finished, clientThread, &QObject::deleteLater);
+    // clientThread에서 유저 정보를 받을 수 있게 신호 연결
+    connect(this, &ChatServer::sendImageToClient, clientThread, &ClientThread::sendImage);
 
-        if (clientSocket->waitForReadyRead()){
-            QByteArray data = clientSocket->readAll();
-            qDebug() << "user data:" << data;
+    clientThread->start();
+}
 
-            // 데이터를 JSON으로 파싱 ( 나중에 수정 )
-            QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
-            QJsonObject jsonObj = jsonDoc.object();
 
-            // USER 정보 파싱
-            QString id = jsonObj["ID"].toString();
-            user->ID = id;
-            QString password = jsonObj["password"].toString();
-            QString name = jsonObj["name"].toString();
+// 유저 정보와 스레드를 clientMap에 추가하는 메서드
+void ChatServer::addClientToMap(ClientThread* clientThread, USER* user) {
+    clientMap.insert(clientThread, user);  // 스레드와 유저를 clientMap에 추가
+}
 
-            if (!id.isEmpty()){
-                emit AddUser(user);
+void ChatServer::removeClient(ClientThread* clientThread) {
+    // clientThread에서 해당하는 유저 정보를 가져옴
+    USER* user = clientMap.value(clientThread);
 
-                // 클라이언트 소켓이 준비되었을 때 데이터 읽기
-                connect(clientSocket, &QTcpSocket::readyRead, [=](){
-                    QByteArray data = clientSocket->readAll();
-                    // 수신한 데이터 처리
-                    emit ProcessData(data, user);
-                    qDebug() << "Received data:" << data;
-                });
-            } else {
-                qDebug() << "Invalid USER ID received";
-                clientSocket->disconnectFromHost();
-            }
-        }
-    });
+    if (user) {
+        qDebug() << "Removing user:" << user->ID;
+        emit DisconnectUser(user);  // UI에 유저 삭제 신호 보냄
+        delete user;  // 유저 객체 삭제
+    }
 
-    // 클라이언트가 연결 종료시 처리
-    connect(clientSocket, &QTcpSocket::disconnected, [=](){
-        qDebug() << "Client disconnected: " << user->ID;
+    // clientMap에서 스레드 삭제
+    clientMap.remove(clientThread);
 
-        emit DisconnectUser(user);
-
-        // 소켓과 USER 삭제
-        clientMap.remove(clientSocket);
-
-        // 메인 스레드에서 스레드 종료를 처리하기 위해 여기서 처리하지 않고 외부에서 처리
-        QMetaObject::invokeMethod(this, [=]() {
-            // 스레드가 종료되지 않았다면 종료를 기다림
-            if (thread->isRunning()) {
-                thread->quit();
-                thread->wait();  // 스레드가 실행 중일 때만 대기
-            }
-            threadList.removeOne(thread);  // 스레드 리스트에서 삭제
-            thread->deleteLater();
-        });
-
-        qDebug() << "Client disconnected and thread finished";
-    });
-
-    thread->start();
-    qDebug() << "init thread";
+    // 스레드 종료 및 삭제
+    if (clientThread->isRunning()) {
+        clientThread->quit();  // 스레드를 종료
+        clientThread->wait();  // 스레드가 종료될 때까지 대기
+    }
+    clientThread->deleteLater();  // 스레드 객체 삭제
 }
 
 void ChatServer::onImageCaptured(int id, const QImage &image) {
@@ -101,20 +79,47 @@ void ChatServer::onImageCaptured(int id, const QImage &image) {
     buffer.open(QIODevice::WriteOnly);
     image.save(&buffer, "JPEG", 50);  // QImage를 JPEG로, 압축품질 50
 
-    // 이미지 크기를 전송
-    int imageSize = byteArray.size();
+    // 이미지 데이터를 전송 큐에 추가
+    QMutexLocker locker(&imageMutex);  // 큐 동기화
+    imageQueue.enqueue(byteArray);     // 전송 큐에 이미지 추가
+    locker.unlock();
 
-    foreach(QTcpSocket* client, clientMap.keys()) {
-        QDataStream out(client);
-        out.setVersion(QDataStream::Qt_5_15);
+    // 큐에 저장된 데이터를 처리하도록 호출
+    broadcastImage();
+}
 
-        // 이미지 크기 먼저 전송
-        out << imageSize;
+void ChatServer::enqueueMessage(const QByteArray& message){
+    QMutexLocker locker(&messageMutex);
+    messageQueue.enqueue(message);
+}
 
-        // 실제 이미지 데이터 전송
-        out.writeRawData(byteArray.data(), byteArray.size());
+void ChatServer::enqueueImage(const QByteArray& imageData){
+    QMutexLocker locker(&imageMutex);
+    imageQueue.enqueue(imageData);
+}
 
-        client->flush();  // 데이터를 즉시 전송
+void ChatServer::broadcastMessage(){
+    /*QMutexLocker locker(&messageMutex);
+    while (!messageQueue.isEmpty()) {
+        QByteArray message = messageQueue.dequeue();
+        foreach(QTcpSocket* client, clientMap.keys()) {
+            client->write(message);
+            client->flush();
+        }
+    }
+*/
+}
+
+void ChatServer::broadcastImage(){
+    QMutexLocker locker(&imageMutex);  // 큐 동기화
+
+    // 큐에 데이터가 있으면 클라이언트로 전송
+    while (!imageQueue.isEmpty()) {
+        QByteArray byteArray = imageQueue.dequeue();  // 큐에서 이미지 가져오기
+
+        // 각 ClientThread에 이미지를 전송하도록 신호 보냄
+        emit sendImageToClient(byteArray);  // 이미지 데이터를 모든 스레드로 전송
+
     }
 }
 

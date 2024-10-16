@@ -15,6 +15,7 @@ SOURCES += \
     camerathread.cpp \
     chatroom.cpp \
     chatserver.cpp \
+    clientthread.cpp \
     main.cpp \
     mainwindow.cpp \
 
@@ -22,6 +23,7 @@ HEADERS += \
     camerathread.h \
     chatroom.h \
     chatserver.h \
+    clientthread.h \
     mainwindow.h
 
 FORMS += \
