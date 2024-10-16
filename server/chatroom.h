@@ -22,6 +22,9 @@ public slots:
     void addUserList(QString id);
     void deleteUserList(QString id);
 
+private slots:
+    void on_managerButton_clicked();
+
 private:
     Ui::chatRoom *ui;
 };

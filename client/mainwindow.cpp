@@ -11,7 +11,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
      ui(new Ui::MainWindow),
-     joinWindow(nullptr)
+     joinWindow(nullptr),
+     networkManager(new NetworkManager(this))
 
 {
 
@@ -33,7 +34,7 @@ void MainWindow::on_connectButton_clicked()
     // 나중에 로그인 구현
     id = ui->ID_Edit->text();
     ui->status_label->setText("Connecting...");
-    tryConnect("127.0.0.1", 8080);
+    tryConnect("127.0.0.1", 8771);
 }
 
 void MainWindow::tryConnect(QString ip, int port){
@@ -98,8 +99,7 @@ void MainWindow::readMsg()
 
 void MainWindow::on_JoinButton_clicked()
 {
-    qDebug() << "Join button clicked"; // 디버깅을 위한 메시지
-
+    qDebug() << "Join button clicked";
     if (joinWindow == nullptr) {
         NetworkManager *networkManager = new NetworkManager(this);
         joinWindow = new JoinWindow(networkManager, this);
@@ -109,3 +109,16 @@ void MainWindow::on_JoinButton_clicked()
     }
     joinWindow->exec();
 }
+
+void MainWindow::on_LoginButton_clicked()
+{
+    qDebug() << "Login button clicked";
+
+    LoginWindow *loginWindow = new LoginWindow(networkManager, this); // LoginWindow를 힙에 생성
+        if (loginWindow->exec() == QDialog::Accepted) {
+            // 로그인 성공 처리
+            // 여기서 필요에 따라 추가 로직을 구현할 수 있습니다.
+        }
+    delete loginWindow; // 사용 후 메모리 해제
+}
+

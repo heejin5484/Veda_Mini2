@@ -14,6 +14,7 @@ TARGET = Server
 SOURCES += \
     chatroom.cpp \
     chatserver.cpp \
+    databasewindow.cpp \
     main.cpp \
     mainwindow.cpp \
     databasemanager.cpp
@@ -21,11 +22,14 @@ SOURCES += \
 HEADERS += \
     chatroom.h \
     chatserver.h \
+    constants.h \
+    databasewindow.h \
     mainwindow.h \
     databasemanager.h
 
 FORMS += \
     chatroom.ui \
+    databasewindow.ui \
     mainwindow.ui
 
 # Default rules for deployment.

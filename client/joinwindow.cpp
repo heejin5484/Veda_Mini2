@@ -45,7 +45,7 @@ void JoinWindow::on_joinBtn_clicked()
         json["name"] = name; // 이름
         json["phone"] = phone; // 전화번호
         json["email"] = email; // 이메일
-        json["username"] = userid; // 사용자 아이디디
+        json["userid"] = userid; // 사용자 아이디디
         json["password"] = password; // 비밀번호
 
         networkManager->sendMessage(json);  // JSON 객체를 서버에 전송

@@ -13,6 +13,7 @@ TARGET = Client
 
 SOURCES += \
     chat.cpp \
+    loginwindow.cpp \
     main.cpp \
     mainwindow.cpp \
     networkmanager.cpp \
@@ -20,12 +21,14 @@ SOURCES += \
 
 HEADERS += \
     chat.h \
+    loginwindow.h \
     mainwindow.h \
     networkmanager.h \
     joinwindow.h
 
 FORMS += \
     chat.ui \
+    loginwindow.ui \
     mainwindow.ui \
     joinwindow.ui
 

@@ -1,5 +1,6 @@
 #include "chatroom.h"
 #include "ui_chatroom.h"
+#include "databasewindow.h"
 #include <QMenu>
 
 chatRoom::chatRoom(QWidget *parent)
@@ -60,3 +61,11 @@ void chatRoom::deleteUserList(QString id){
         qDebug() << id << " not found in user list.";
     }
 }
+
+void chatRoom::on_managerButton_clicked()
+{
+    DatabaseWindow *dbWindow = new DatabaseWindow(this);
+    dbWindow->exec();
+
+}
+

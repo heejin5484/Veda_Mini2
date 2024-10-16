@@ -56,6 +56,19 @@
     <string>Send</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="managerButton">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>320</y>
+     <width>89</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Manager</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

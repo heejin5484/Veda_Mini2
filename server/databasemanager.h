@@ -9,16 +9,19 @@
 
 class DatabaseManager {
 public:
-    explicit DatabaseManager(const QString &dbName);
+    explicit DatabaseManager(const QString& dbName);
+    bool init();
+    bool saveUserData(const QString& name, const QString& phone, const QString& email, const QString& userid, const QString& password, const QString& type);
+    QSqlQuery loadUsers();
+    QSqlQuery loadMessages();
     ~DatabaseManager();
 
-    bool init();
-    bool saveUserData(const QString &username, const QString &password, const QString &name, const QString &phone, const QString &email);
-    bool checkUser(const QString &username, const QString &password);
-
 private:
-    QString databaseName;
     QSqlDatabase db;
+
+
+
+
 };
 
 #endif // DATABASEMANAGER_H
