@@ -17,7 +17,6 @@
 #include <QMutex>
 #include <QQueue>
 
-class ClientThread;
 class MainWindow;
 
 typedef struct user{
@@ -33,7 +32,7 @@ class ChatServer : public QTcpServer
     Q_OBJECT
 
 public:
-    ChatServer(QObject *parent = nullptr);
+    //ChatServer(QObject *parent = nullptr);
 
     // 메시지 큐 / 이미지 큐에 데이터 추가
     void enqueueMessage(const QByteArray& message);
@@ -43,8 +42,15 @@ public:
     void broadcastMessage();
     void broadcastImage();
 
-    void removeClient(ClientThread* clientThread);
-    void addClientToMap(ClientThread* clientThread, USER* user);
+    void removeClient(QThread* clientThread);
+    void addClientToMap(QThread* clientThread, USER* user);
+
+    // 싱글톤 인스턴스 가져오기
+    static ChatServer& instance() {
+        static ChatServer instance;
+        return instance;
+    }
+     void setMainWindow(MainWindow* window);
 
 public slots:
     void onImageCaptured(int id, const QImage &image);
@@ -64,8 +70,16 @@ signals:
     void sendImageToClient(const QByteArray& image);
 
 private:
+    // 싱글톤이므로 생성자를 private으로 제한
+    ChatServer(QObject *parent = nullptr);
+    ~ChatServer() {}
+
+    // 복사 및 대입을 금지
+    ChatServer(const ChatServer&) = delete;
+    ChatServer& operator=(const ChatServer&) = delete;
+
     MainWindow *mainwindow;
-    QMap<ClientThread*, USER*> clientMap; // 스레드와 USER를 매핑하여 관리
+    QMap<QThread*, USER*> clientMap; // 스레드와 USER를 매핑하여 관리
 
     QQueue<QByteArray> messageQueue;  // 메시지 전송 큐
     QQueue<QByteArray> imageQueue;    // 이미지 전송 큐

@@ -1,51 +1,37 @@
-#include "clientthread.h"
-#include <QDebug>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include "chatserver.h"
+#include "videosender.h"
 
-ClientThread::ClientThread(qintptr socketDescriptor, QObject *parent)
-    : QThread(parent), socketDescriptor(socketDescriptor), clientSocket(nullptr), isUserAuthenticated(false) {moveToThread(this);}
-
-
-ClientThread::~ClientThread() {
-
-
-    // delete user; 찾아보기 여기서 삭제하는게 적절한지..
+VideoSender::VideoSender() : chatserver(ChatServer::instance())
+{
+    clientSocket = nullptr;
+    isUserAuthenticated = false;
 }
 
-void ClientThread::run() {
-    // clientSocket은 이미 ChatServer에서 생성되고 설정된 상태
+
+VideoSender::~VideoSender() {
+        // delete user; 찾아보기 여기서 삭제하는게 적절한지..
+}
+
+
+void VideoSender::setSocket(QTcpSocket* socket){
+    clientSocket = socket;
+
     if (clientSocket == nullptr) {
         qDebug() << "Error: No valid socket passed to thread";
         return;
     }
 
     qDebug() << "clientSocket is in thread:" << clientSocket->thread();
-    qDebug() << "Current thread:" << this->thread();
-    qDebug() << "..";
-    // 스레드로 소켓을 이동
-    clientSocket->moveToThread(this);
-    qDebug() << "here^____^";
-    // 소켓 이벤트 연결
-    connect(clientSocket, &QTcpSocket::readyRead, this, &ClientThread::onReadyRead);
-    connect(clientSocket, &QTcpSocket::disconnected, this, &ClientThread::onDisconnected);
+    qDebug() << "this thread:" << this->thread();
+    qDebug() << "Current thread: " << QThread::currentThread();
+
+    connect(clientSocket, &QTcpSocket::readyRead, this, &VideoSender::onReadyRead);
+    connect(clientSocket, &QTcpSocket::disconnected, this, &VideoSender::onDisconnected);
 
     // 서버의 카메라이미지 준비신호와 연결
-    //connect(static_cast<ChatServer*>(parent()), &ChatServer::sendImageToClient, this, &ClientThread::sendImage);
-    connect(this, &ClientThread::sendImagefromServer, this, &ClientThread::sendImage);
-
-    qDebug() << "clientSocket is in thread:" << clientSocket->thread();
-    qDebug() << "Current thread:" << QThread::currentThread();
-
-    exec();  // 스레드 이벤트 루프 실행
+    connect(&chatserver, &ChatServer::sendImageToClient, this, &VideoSender::sendImage);
 }
 
-void ClientThread::setSocket(QTcpSocket* socket){
-    clientSocket = socket;
-}
-
-void ClientThread::onReadyRead() {
+void VideoSender::onReadyRead() {
     QByteArray data = clientSocket->readAll();
     qDebug() << "Data received:" << data;
     // 처음 읽는 데이터는 유저 정보로 가정
@@ -63,11 +49,9 @@ void ClientThread::onReadyRead() {
             qDebug() << "User authenticated:" << user->ID;
 
             // 서버에게 유저 정보 전달
-            ChatServer* server = static_cast<ChatServer*>(parent());
-            if (server) {
-                emit server->AddUser(user);  // 서버에 유저 정보 추가
-                server->addClientToMap(this, user);  // clientMap에 추가
-            }
+            emit ChatServer::instance().AddUser(user);  // 서버에 유저 정보 추가
+            ChatServer::instance().addClientToMap(this->thread(), user);  // clientMap에 추가
+
             isUserAuthenticated = true;  // 유저 인증 완료
         } else {
             qDebug() << "Invalid user information received";
@@ -85,13 +69,13 @@ void ClientThread::onReadyRead() {
     }
 }
 
-void ClientThread::onDisconnected() {
+void VideoSender::onDisconnected() {
     qDebug() << "Client disconnected: " << user->ID;
 
     // 서버에게 이 유저를 삭제하도록 요청
     ChatServer* server = static_cast<ChatServer*>(parent());
     if (server) {
-        server->removeClient(this);  // 서버에게 클라이언트 삭제 요청
+        server->removeClient(this->thread());  // 서버에게 클라이언트 삭제 요청
     }
 
     // 스레드 종료 전 소켓을 안전하게 종료
@@ -103,7 +87,7 @@ void ClientThread::onDisconnected() {
 }
 
 
-void ClientThread::sendImage(const QByteArray& image) {
+void VideoSender::sendImage(const QByteArray& image) {
     qDebug() << "----------------------------";
     qDebug() << "clientSocket is in thread:" << clientSocket->thread();
     qDebug() << "Current thread:" << QThread::currentThread();
@@ -119,8 +103,8 @@ void ClientThread::sendImage(const QByteArray& image) {
         if (clientSocket->error() != QAbstractSocket::UnknownSocketError) {
             qDebug() << "Socket error:" << clientSocket->errorString();
         }
-       // 다른 스레드에서 안전하게 실행
+        // 다른 스레드에서 안전하게 실행
     } else {
-    qDebug() << "Socket is not connected or invalid";
+        qDebug() << "Socket is not connected or invalid";
     }
 }

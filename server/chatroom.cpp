@@ -11,10 +11,10 @@
 #include <QImageCapture>
 #include <QMediaDevices>
 
-chatRoom::chatRoom(QWidget *parent, ChatServer *server)
+chatRoom::chatRoom(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::chatRoom)
-    , chatserver(server)
+    , chatserver(ChatServer::instance())
 {
     ui->setupUi(this);
 
@@ -29,7 +29,7 @@ chatRoom::chatRoom(QWidget *parent, ChatServer *server)
     // 스레드 생성 및 실행
     CameraThread *cameraThread = new CameraThread(camera, imageCapture, this);
     connect(imageCapture, &QImageCapture::imageCaptured, this, &chatRoom::onImageCaptured);
-    connect(imageCapture, &QImageCapture::imageCaptured, chatserver, &ChatServer::onImageCaptured);
+    connect(imageCapture, &QImageCapture::imageCaptured, &chatserver, &ChatServer::onImageCaptured);
 
     cameraThread->start();  // 스레드 시작
 

@@ -30,8 +30,9 @@ void MainWindow::on_Login_button_clicked()
 }
 
 void MainWindow::LoginSuccess(){
+    ChatServer& server = ChatServer::instance();
     if (ServerOpen(8080)){
-        chatroom = new chatRoom(this, static_cast<ChatServer*>(server));
+        chatroom = new chatRoom(this);
         setCentralWidget(chatroom);
         connect(this, &MainWindow::NewUserAdd, chatroom, &chatRoom::addUserList);
         connect(this, &MainWindow::DisconnectUser, chatroom, &chatRoom::deleteUserList);
@@ -39,9 +40,13 @@ void MainWindow::LoginSuccess(){
 }
 
 bool MainWindow::ServerOpen(int address){
-    server = new ChatServer(this);
+    // ChatServer의 싱글톤 인스턴스에 접근
+    ChatServer& server = ChatServer::instance();
 
-    if (!server->listen(QHostAddress::Any, address)){
+    // MainWindow를 ChatServer에 전달
+    server.setMainWindow(this);
+
+    if (!server.listen(QHostAddress::Any, address)){
         qDebug() << "Server could not start!";
         return false;
     }

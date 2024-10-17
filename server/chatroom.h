@@ -18,7 +18,7 @@ class chatRoom : public QWidget
     Q_OBJECT
 
 public:
-    explicit chatRoom(QWidget *parent = nullptr, ChatServer *server = nullptr);
+    explicit chatRoom(QWidget *parent = nullptr);
     ~chatRoom();
 
 public slots:
@@ -31,7 +31,7 @@ public slots:
 private:
     Ui::chatRoom *ui;
 
-    ChatServer *chatserver;
+    ChatServer& chatserver;
 
 
     QImage capturedImage;

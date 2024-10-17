@@ -6,16 +6,32 @@
 #include <QDir>
 #include <QBuffer>
 #include "clientthread.h"
+#include "videosender.h"
 
 ChatServer::ChatServer(QObject *parent)
     : QTcpServer(parent), mainwindow(nullptr)
 {
-    mainwindow = static_cast<MainWindow*>(parent);
+/*    mainwindow = static_cast<MainWindow*>(parent);
 
     // mainwindow와 연결
     connect(this, &ChatServer::AddUser, mainwindow, &MainWindow::UserConnected, Qt::UniqueConnection);
     connect(this, &ChatServer::ProcessData, mainwindow, &MainWindow::DataIncome);
     connect(this, &ChatServer::DisconnectUser, mainwindow, &MainWindow::UserDisconnected);
+*/
+}
+
+void ChatServer::setMainWindow(MainWindow* window)
+{
+    mainwindow = window;
+
+    // MainWindow가 설정된 후에 연결을 설정합니다.
+    if (mainwindow != nullptr) {
+        connect(this, &ChatServer::AddUser, mainwindow, &MainWindow::UserConnected, Qt::UniqueConnection);
+        connect(this, &ChatServer::ProcessData, mainwindow, &MainWindow::DataIncome);
+        connect(this, &ChatServer::DisconnectUser, mainwindow, &MainWindow::UserDisconnected);
+    } else {
+        qDebug() << "MainWindow is nullptr, connections not made.";
+    }
 }
 
 void ChatServer::incomingConnection(qintptr socketDescriptor) {
@@ -29,28 +45,35 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
     }
 
     // 새로운 스레드를 생성
-    ClientThread* clientThread = new ClientThread(socketDescriptor, this);
+    //ClientThread* clientThread = new ClientThread(socketDescriptor, this);
+    QThread* thread = new QThread;
+    VideoSender* sender = new VideoSender();
+    sender->moveToThread(thread); // sender에서 QObject를 상속받을때 public으로 상속받았어야함..
+    clientSocket->moveToThread(thread);
+
+    sender->setSocket(clientSocket);
     // 소켓을 스레드로 이동
-    clientSocket->moveToThread(clientThread);
 
-    clientThread->setSocket(clientSocket); // 소켓을 스레드에 전달
 
-    clientThread->start();
 
-    connect(clientThread, &ClientThread::finished, clientThread, &QObject::deleteLater);
+
+    connect(thread, &ClientThread::finished, thread, &QObject::deleteLater);
+    // client 접속 끊기면 thread 종료하는거도 넣기
+
     // clientThread에서 유저 정보를 받을 수 있게 신호 연결
-    connect(this, &ChatServer::sendImageToClient, static_cast<ClientThread*>(clientThread), &ClientThread::sendImagefromServer);
-
+    connect(this, &ChatServer::sendImageToClient, sender, &VideoSender::sendImage);
+    thread->start();
 
 }
 
 
 // 유저 정보와 스레드를 clientMap에 추가하는 메서드
-void ChatServer::addClientToMap(ClientThread* clientThread, USER* user) {
+void ChatServer::addClientToMap(QThread* clientThread, USER* user) {
+    qDebug() << " welcome------------------------";
     clientMap.insert(clientThread, user);  // 스레드와 유저를 clientMap에 추가
 }
 
-void ChatServer::removeClient(ClientThread* clientThread) {
+void ChatServer::removeClient(QThread* clientThread) {
     // clientThread에서 해당하는 유저 정보를 가져옴
     USER* user = clientMap.value(clientThread);
 
@@ -115,7 +138,7 @@ void ChatServer::broadcastImage(){
     QMutexLocker locker(&imageMutex);  // 큐 동기화
 
     if (clientMap.isEmpty()) {
-        //qDebug() << "No clients connected, skipping broadcast.";
+        qDebug() << "No clients connected, skipping broadcast.";
         imageQueue.clear();  // 클라이언트가 없으면 큐를 비움
         return;  // 클라이언트가 없으면 그냥 리턴
     }
@@ -123,7 +146,7 @@ void ChatServer::broadcastImage(){
     qDebug() << "Clients connected: " << clientMap.size();
 
     // 각 클라이언트의 스레드 상태를 체크하고 이미지 전송
-    foreach (ClientThread* clientThread, clientMap.keys()) {
+    foreach (QThread* clientThread, clientMap.keys()) {
         if (!clientThread->isRunning()) {
             qDebug() << "Client thread is not running, skipping...";
             continue;

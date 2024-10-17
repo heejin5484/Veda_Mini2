@@ -15,16 +15,16 @@ SOURCES += \
     camerathread.cpp \
     chatroom.cpp \
     chatserver.cpp \
-    clientthread.cpp \
     main.cpp \
     mainwindow.cpp \
+    videosender.cpp
 
 HEADERS += \
     camerathread.h \
     chatroom.h \
     chatserver.h \
-    clientthread.h \
-    mainwindow.h
+    mainwindow.h \
+    videosender.h
 
 FORMS += \
     chatroom.ui \
