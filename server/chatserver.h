@@ -17,6 +17,7 @@
 #include <QMutex>
 #include <QQueue>
 
+class VideoSender;
 class MainWindow;
 
 typedef struct user{
@@ -42,8 +43,8 @@ public:
     void broadcastMessage();
     void broadcastImage();
 
-    void removeClient(QThread* clientThread);
-    void addClientToMap(QThread* clientThread, USER* user);
+    void removeClient(VideoSender* sender);
+    void addClientToMap(VideoSender* sender, USER* user);
 
     // 싱글톤 인스턴스 가져오기
     static ChatServer& instance() {
@@ -79,7 +80,7 @@ private:
     ChatServer& operator=(const ChatServer&) = delete;
 
     MainWindow *mainwindow;
-    QMap<QThread*, USER*> clientMap; // 스레드와 USER를 매핑하여 관리
+    QMap<VideoSender*, USER*> clientMap; // 스레드와 USER를 매핑하여 관리
 
     QQueue<QByteArray> messageQueue;  // 메시지 전송 큐
     QQueue<QByteArray> imageQueue;    // 이미지 전송 큐

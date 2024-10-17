@@ -50,7 +50,9 @@ void VideoSender::onReadyRead() {
 
             // 서버에게 유저 정보 전달
             emit ChatServer::instance().AddUser(user);  // 서버에 유저 정보 추가
-            ChatServer::instance().addClientToMap(this->thread(), user);  // clientMap에 추가
+            ChatServer::instance().addClientToMap(this, user);  // clientMap에 추가
+            qDebug() << "videosender thread : " << this->thread();
+            qDebug() << "cur thread : " << QThread::currentThread();
 
             isUserAuthenticated = true;  // 유저 인증 완료
         } else {
@@ -75,7 +77,7 @@ void VideoSender::onDisconnected() {
     // 서버에게 이 유저를 삭제하도록 요청
     ChatServer* server = static_cast<ChatServer*>(parent());
     if (server) {
-        server->removeClient(this->thread());  // 서버에게 클라이언트 삭제 요청
+        server->removeClient(this);  // 서버에게 클라이언트 삭제 요청
     }
 
     // 스레드 종료 전 소켓을 안전하게 종료

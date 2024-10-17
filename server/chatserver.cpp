@@ -5,7 +5,7 @@
 #include <QJsonValue>
 #include <QDir>
 #include <QBuffer>
-#include "clientthread.h"
+//#include "clientthread.h"
 #include "videosender.h"
 
 ChatServer::ChatServer(QObject *parent)
@@ -32,6 +32,8 @@ void ChatServer::setMainWindow(MainWindow* window)
     } else {
         qDebug() << "MainWindow is nullptr, connections not made.";
     }
+    qDebug() << "Current thread: " << QThread::currentThread();
+    qDebug() << "chatserver thread" << this->thread();
 }
 
 void ChatServer::incomingConnection(qintptr socketDescriptor) {
@@ -49,15 +51,16 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
     QThread* thread = new QThread;
     VideoSender* sender = new VideoSender();
     sender->moveToThread(thread); // sender에서 QObject를 상속받을때 public으로 상속받았어야함..
+    // 소켓을 스레드로 이동
     clientSocket->moveToThread(thread);
 
     sender->setSocket(clientSocket);
-    // 소켓을 스레드로 이동
 
 
 
 
-    connect(thread, &ClientThread::finished, thread, &QObject::deleteLater);
+
+    //connect(thread, &ClientThread::finished, thread, &QObject::deleteLater);
     // client 접속 끊기면 thread 종료하는거도 넣기
 
     // clientThread에서 유저 정보를 받을 수 있게 신호 연결
@@ -68,14 +71,14 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
 
 
 // 유저 정보와 스레드를 clientMap에 추가하는 메서드
-void ChatServer::addClientToMap(QThread* clientThread, USER* user) {
+void ChatServer::addClientToMap(VideoSender* sender, USER* user) {
     qDebug() << " welcome------------------------";
-    clientMap.insert(clientThread, user);  // 스레드와 유저를 clientMap에 추가
+    clientMap.insert(sender, user);  // 스레드와 유저를 clientMap에 추가
 }
 
-void ChatServer::removeClient(QThread* clientThread) {
+void ChatServer::removeClient(VideoSender* sender) {
     // clientThread에서 해당하는 유저 정보를 가져옴
-    USER* user = clientMap.value(clientThread);
+    USER* user = clientMap.value(sender);
 
     if (user) {
         qDebug() << "Removing user:" << user->ID;
@@ -84,14 +87,14 @@ void ChatServer::removeClient(QThread* clientThread) {
     }
 
     // clientMap에서 스레드 삭제
-    clientMap.remove(clientThread);
+    clientMap.remove(sender);
 
     // 스레드 종료 및 삭제
-    if (clientThread->isRunning()) {
-        clientThread->quit();  // 스레드를 종료
-        clientThread->wait();  // 스레드가 종료될 때까지 대기
-    }
-    clientThread->deleteLater();  // 스레드 객체 삭제
+    // if (clientThread->isRunning()) {
+    //     clientThread->quit();  // 스레드를 종료
+    //     clientThread->wait();  // 스레드가 종료될 때까지 대기
+    // }
+    //clientThread->deleteLater();  // 스레드 객체 삭제
 }
 
 void ChatServer::onImageCaptured(int id, const QImage &image) {
@@ -138,7 +141,7 @@ void ChatServer::broadcastImage(){
     QMutexLocker locker(&imageMutex);  // 큐 동기화
 
     if (clientMap.isEmpty()) {
-        qDebug() << "No clients connected, skipping broadcast.";
+        //qDebug() << "No clients connected, skipping broadcast.";
         imageQueue.clear();  // 클라이언트가 없으면 큐를 비움
         return;  // 클라이언트가 없으면 그냥 리턴
     }
@@ -146,14 +149,14 @@ void ChatServer::broadcastImage(){
     qDebug() << "Clients connected: " << clientMap.size();
 
     // 각 클라이언트의 스레드 상태를 체크하고 이미지 전송
-    foreach (QThread* clientThread, clientMap.keys()) {
-        if (!clientThread->isRunning()) {
-            qDebug() << "Client thread is not running, skipping...";
-            continue;
-        }
+    foreach (VideoSender* sender, clientMap.keys()) {
+        // if (!sender->isRunning()) {
+        //     qDebug() << "Client thread is not running, skipping...";
+        //     continue;
+        // }
         qDebug() << " ==============";
-        qDebug() << clientThread->thread();
-        qDebug() << clientThread->currentThread();
+        qDebug() << sender->thread();
+        qDebug() << QThread::currentThread();
         qDebug() << "===============";
 
         // 이미지 큐에서 이미지를 가져옴
