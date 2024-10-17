@@ -34,6 +34,7 @@ void MainWindow::LoginSuccess(){
     ServerOpen(SERVER_PORT);
     chatroom = new chatRoom(this);
     setCentralWidget(chatroom);
+
     connect(this, &MainWindow::NewUserAdd, chatroom, &chatRoom::addUserList);
     connect(this, &MainWindow::DisconnectUser, chatroom, &chatRoom::deleteUserList);
 }
@@ -50,19 +51,17 @@ void MainWindow::ServerOpen(int address) {
 
 void MainWindow::UserConnected(USER* usr){
     qDebug() << "User connected";
-    UserMap.insert(usr->ID, usr);
-    emit NewUserAdd(usr->ID);
+    UserMap.insert(usr->userid, usr);
+    qDebug() << "Current users in UserMap:" << UserMap.keys(); // 현재 사용자의 ID 로그
+    emit NewUserAdd(usr->userid); //user add signal
 }
 
 void MainWindow::DataIncome(QByteArray data, USER *user){
-    qDebug() << "Data Incoming from user:" << user->ID;
-
-
+    qDebug() << "Data Incoming from user:" << user->userid;
 
         for (auto otherUser : UserMap) {
             if (otherUser != user) {
                 if (otherUser->usersocket) {
-
                     otherUser->usersocket->write(data);
                     otherUser->usersocket->flush();
                 }
@@ -74,10 +73,10 @@ void MainWindow::DataIncome(QByteArray data, USER *user){
 
 
 void MainWindow::UserDisconnected(USER *usr){
-    if (UserMap.contains(usr->ID)){
-        UserMap.remove(usr->ID);
-        qDebug() << "User removed from UserMap: " << usr->ID;
-        emit DisconnectUser(usr->ID);
+    if (UserMap.contains(usr->userid)){
+        UserMap.remove(usr->userid);
+        qDebug() << "User removed from UserMap: " << usr->userid;
+        emit DisconnectUser(usr->userid);
     }
 
     if (usr->usersocket) {

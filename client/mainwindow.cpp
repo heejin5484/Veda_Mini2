@@ -33,7 +33,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_connectButton_clicked()
 {
     // 나중에 로그인 구현
-    id = ui->ID_Edit->text();
+    //id = ui->ID_Edit->text();
     ui->status_label->setText("Connecting...");
     tryConnect("127.0.0.1", 8771);
 }

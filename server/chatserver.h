@@ -19,8 +19,8 @@
 class MainWindow;
 
 typedef struct user{
-    QString ID;
-    QString PW;
+    QString userid;
+    QString password;
     QString name;
     QTcpSocket *usersocket;
 }USER; // 논의 필요
@@ -41,7 +41,7 @@ private slots:
     void processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *clientSocket);
     void processMessageRequest(const QJsonObject &jsonObj, QTcpSocket *clientSocket);
     void sendResponse(QTcpSocket *clientSocket, const QString &status, const QString &message);
-
+    void sendResponse(QTcpSocket *clientSocket, const QJsonObject &responseJson);
 signals:
     void AddUser(USER *user);
     void DisconnectUser(USER *user);

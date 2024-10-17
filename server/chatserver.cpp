@@ -75,8 +75,8 @@ void ChatServer::processSignupRequest(const QJsonObject &jsonObj, QTcpSocket *cl
     if (!userid.isEmpty())
     {
         USER *user = new USER; // USER 구조체 인스턴스 생성
-        user->ID = userid;
-        user->PW = password;
+        user->userid = userid;
+        user->password = password;
         user->name = name;
         user->usersocket = clientSocket;
 
@@ -126,7 +126,7 @@ void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *cli
 
     // 쿼리 실행
     QSqlQuery query(dbManager.database()); // DatabaseManager에서 db를 가져옵니다.
-    query.prepare("SELECT password FROM users WHERE userid = :userid");
+    query.prepare("SELECT name, password FROM users WHERE userid = :userid"); // 이름도 선택
     query.bindValue(":userid", userid);
 
     if (!query.exec()) {
@@ -136,18 +136,29 @@ void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *cli
     }
 
     if (query.next()) {
-        QString storedPassword = query.value(0).toString(); // 데이터베이스에서 비밀번호 가져오기
+        QString storedName = query.value(0).toString(); // 데이터베이스에서 이름 가져오기
+        QString storedPassword = query.value(1).toString(); // 데이터베이스에서 비밀번호 가져오기
+        qDebug() << "Stored name:" << storedName;
         qDebug() << "Stored password:" << storedPassword;
 
         if (storedPassword == password) {
             // 로그인 성공 시 USER 구조체 인스턴스 생성
             USER *user = new USER;
-            user->ID = userid; // 사용자 ID 설정
-            user->PW = password; // 비밀번호 설정
+            user->userid = userid; // 사용자 ID 설정
+            user->password = password; // 비밀번호 설정
+            user->name = storedName; // 사용자 이름 설정
             user->usersocket = clientSocket; // 클라이언트 소켓 설정
 
-            emit AddUser(user); // 로그인 성공 시 AddUser 시그널 발생
-            sendResponse(clientSocket, "success", "로그인 성공");
+            // 클라이언트에게 성공 응답과 함께 이름, ID, 비밀번호 전송
+            QJsonObject responseJson;
+            responseJson["status"] = "success";
+            responseJson["message"] = "로그인 성공";
+            responseJson["userid"] = user->userid;
+            responseJson["name"] = user->name;
+            responseJson["password"] = user->password;
+            emit AddUser(user);
+            qDebug() << "User added to server: " << user->userid;
+            sendResponse(clientSocket, responseJson); // JSON 객체 전송
         }
         else {
             sendResponse(clientSocket, "fail", "비밀번호가 틀렸습니다.");
@@ -159,6 +170,7 @@ void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *cli
 
     dbManager.close(); // 연결 종료
 }
+
 
 
 
@@ -177,3 +189,12 @@ void ChatServer::sendResponse(QTcpSocket *clientSocket, const QString &status, c
     clientSocket->write(responseData + "\n"); // 개행 문자 추가
     clientSocket->flush();  // 데이터 전송 완료를 보장
 }
+
+void ChatServer::sendResponse(QTcpSocket *clientSocket, const QJsonObject &responseJson) {
+    QJsonDocument responseDoc(responseJson);
+    QByteArray responseData = responseDoc.toJson(QJsonDocument::Compact);
+    qDebug() << "서버 응답 전송:" << responseData; // JSON 응답 디버깅 출력
+    clientSocket->write(responseData + "\n"); // 개행 문자 추가
+    clientSocket->flush();  // 데이터 전송 완료를 보장
+}
+

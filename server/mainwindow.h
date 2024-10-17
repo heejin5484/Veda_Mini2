@@ -28,7 +28,6 @@ public slots:
     void on_Login_button_clicked();
     void UserConnected(USER* usr);
     void DataIncome(QByteArray data, USER* user);
-    //void DataIncome(QByteArray data, QTcpSocket *clientSocket);
     void UserDisconnected(USER *usr);
 
 signals :
@@ -38,6 +37,7 @@ signals :
 private:
     Ui::MainWindow *ui;
     void LoginSuccess();
+    //ChatServer *server;
     chatRoom *chatroom;
     void ServerOpen(int address);
     QMap<QString, USER*> UserMap;

@@ -14,6 +14,13 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
+typedef struct user {
+    QString userid;
+    QString password;
+    QString name;
+    QTcpSocket *usersocket;
+} USER;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -23,6 +30,7 @@ public:
     ~MainWindow();
     QTcpSocket *clientSocket;
     QString id;
+    USER currentUser; // currentuser val
     void sendMsg(QString msg);
     void setConnectButtonEnabled(bool enabled);
 
@@ -32,12 +40,11 @@ private slots:
     void onConnected();
     void failedConnect();
     void readMsg();
-
     void on_LoginButton_clicked();
 
 private:
-    void on_JoinButton_clicked();
 
+    void on_JoinButton_clicked();
     Ui::MainWindow *ui;
     JoinWindow *joinWindow;
     LoginWindow *loginWindow;
