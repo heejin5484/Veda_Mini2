@@ -91,9 +91,17 @@ void MainWindow::UserDisconnected(USER *usr){
         emit DisconnectUser(usr->ID);
     }
 
-    if (usr->usersocket) {
-        delete usr->usersocket;
-    }
-    delete usr;
-    qDebug() << "User object deleted";
+    // if (usr) {
+    //     if (usr->usersocket) {
+    //         qDebug() << "Deleting user socket.";
+    //         usr->usersocket->deleteLater();  // 안전하게 소켓을 삭제
+    //         usr->usersocket = nullptr;  // 포인터 초기화
+    //     }
+
+    //     qDebug() << "Deleting user object.";
+    //     delete usr;  // 사용자 객체 삭제
+    //     usr = nullptr;  // 포인터 초기화
+    // }
+
+    qDebug() << "User object deleted.";
 }

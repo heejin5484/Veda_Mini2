@@ -67,7 +67,7 @@ protected :
 signals:
     void ProcessData(QByteArray data, USER* user);
     void AddUser(USER* user);
-    void DisconnectUser(USER *user);
+    void DisconnectUser(USER* user);
     void sendImageToClient(const QByteArray& image);
 
 private:

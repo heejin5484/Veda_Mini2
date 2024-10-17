@@ -9,8 +9,9 @@ VideoSender::VideoSender() : chatserver(ChatServer::instance())
 
 VideoSender::~VideoSender() {
         // delete user; 찾아보기 여기서 삭제하는게 적절한지..
+    qDebug() << "goodbye";
+    qDebug() << user->ID;
 }
-
 
 void VideoSender::setSocket(QTcpSocket* socket){
     clientSocket = socket;
@@ -64,10 +65,8 @@ void VideoSender::onReadyRead() {
         qDebug() << "Data received:" << data;
 
         // 서버로부터 데이터 처리
-        ChatServer* server = static_cast<ChatServer*>(parent());
-        if (server) {
-            emit server->ProcessData(data, user);
-        }
+        emit ChatServer::instance().ProcessData(data, user);
+
     }
 }
 
@@ -75,25 +74,23 @@ void VideoSender::onDisconnected() {
     qDebug() << "Client disconnected: " << user->ID;
 
     // 서버에게 이 유저를 삭제하도록 요청
-    ChatServer* server = static_cast<ChatServer*>(parent());
-    if (server) {
-        server->removeClient(this);  // 서버에게 클라이언트 삭제 요청
-    }
+    ChatServer::instance().removeClient(this);  // 서버에게 클라이언트 삭제 요청
 
-    // 스레드 종료 전 소켓을 안전하게 종료
+    // 스레드 종료 전 소켓을 안전하게 종료 ->> 삭제로 바꿔야할듯
     if (clientSocket) {
-        clientSocket->disconnectFromHost();
-        clientSocket->waitForDisconnected();
-        clientSocket->deleteLater();
+        qDebug() << "Client disconnected, deleting socket.";
+        clientSocket->deleteLater();  // 안전하게 삭제
+        clientSocket = nullptr;  // 포인터를 nullptr로 설정하여 재사용 방지
     }
+    emit disconnected();
 }
 
 
 void VideoSender::sendImage(const QByteArray& image) {
-    qDebug() << "----------------------------";
-    qDebug() << "clientSocket is in thread:" << clientSocket->thread();
-    qDebug() << "Current thread:" << QThread::currentThread();
     if (clientSocket && clientSocket->state() == QAbstractSocket::ConnectedState) {
+        qDebug() << "----------------------------";
+        qDebug() << "clientSocket is in thread:" << clientSocket->thread();
+        qDebug() << "Current thread:" << QThread::currentThread();
         QDataStream out(clientSocket);
         out.setVersion(QDataStream::Qt_5_15);
         int imageSize = image.size();

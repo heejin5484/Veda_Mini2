@@ -18,6 +18,7 @@ public slots:
 
 signals:
     void ProcessData(QByteArray data, USER* user);
+    void disconnected();
 
 private:
     QTcpSocket *clientSocket;  // 클라이언트 소켓

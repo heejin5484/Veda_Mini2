@@ -46,7 +46,7 @@ chatRoom::~chatRoom()
 void chatRoom::onImageCaptured(int id, const QImage &image)
 {
     Q_UNUSED(id);
-    qDebug() << "Image Captured:" << !image.isNull();
+    //qDebug() << "Image Captured:" << !image.isNull();
 
     if (!image.isNull()) {
         // QLabel의 크기
