@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QDebug>
 
 LoginWindow::LoginWindow(NetworkManager *networkManager, QWidget *parent) :
     QDialog(parent),
@@ -11,8 +12,9 @@ LoginWindow::LoginWindow(NetworkManager *networkManager, QWidget *parent) :
     networkManager(networkManager)
 {
     ui->setupUi(this);
+    applyStyles();
     connect(networkManager, &NetworkManager::responseReceived, this, &LoginWindow::handleServerResponse);
-
+    connect(ui->togglePasswordButton, &QPushButton::clicked, this, &LoginWindow::togglePasswordVisibility);
 }
 
 LoginWindow::~LoginWindow()
@@ -50,9 +52,17 @@ void LoginWindow::handleServerResponse(bool success, const QString &message) {
         // MainWindow에 사용자 정보 설정
         MainWindow *mainWindow = static_cast<MainWindow*>(parent());
         if (mainWindow) {
-            mainWindow->currentUser.userid = jsonObj["userid"].toString();
-            mainWindow->currentUser.name = jsonObj["name"].toString();
-            mainWindow->currentUser.password = jsonObj["password"].toString(); // 비밀번호는 일반적으로 안전을 위해 저장하지 않는 것이 좋습니다.
+        QString userid = jsonObj["userid"].toString();
+        QString name = jsonObj["name"].toString();
+        QString password = jsonObj["password"].toString();
+
+        // 데이터를 currentUser에 저장
+        mainWindow->currentUser.userid = userid;
+        mainWindow->currentUser.name = name;
+        mainWindow->currentUser.password = password;
+
+            qDebug() << "로그인 성공! 유저 아이디: " << mainWindow->currentUser.userid;
+            qDebug() << "로그인 성공! 유저 이름: " << mainWindow->currentUser.name;
 
             QMessageBox::information(this, "로그인 성공", "환영합니다, " + mainWindow->currentUser.name + "님!");
             mainWindow->setConnectButtonEnabled(true);
@@ -64,4 +74,53 @@ void LoginWindow::handleServerResponse(bool success, const QString &message) {
         QMessageBox::warning(this, "로그인 실패", message);
     }
 }
+void LoginWindow::togglePasswordVisibility() {
+    // 비밀번호 가시성 전환
+    if (ui->passwordLineEdit->echoMode() == QLineEdit::Password) {
+        ui->passwordLineEdit->setEchoMode(QLineEdit::Normal);  // 비밀번호 보이기
+    } else {
+        ui->passwordLineEdit->setEchoMode(QLineEdit::Password);  // 비밀번호 숨기기
+    }
+}
 
+void LoginWindow::applyStyles()
+{
+    this->setStyleSheet(
+        "QDialog {"
+        "background-color: #f2f2f2;"  // 배경색
+        "border-radius: 10px;"  // 둥근 모서리
+        "padding: 20px;"
+        "}"
+        "QPushButton {"
+        "background-color: #4CAF50;"  // 기본 버튼 색
+        "color: white;"
+        "border: none;"
+        "border-radius: 5px;"  // 둥근 버튼
+        "padding: 10px;"
+        "font-size: 16px;"
+        "}"
+        "QPushButton:hover {"
+        "background-color: #45a049;"  // 호버 시 색상 변경
+        "}"
+        "QPushButton:pressed {"
+        "background-color: #388e3c;"  // 클릭 시 색상 변경
+        "}"
+        "QLineEdit {"
+        "border: 1px solid #ccc;"  // 입력 필드 테두리
+        "border-radius: 5px;"  // 둥근 입력 필드
+        "padding: 10px;"
+        "background-color: white;"  // 입력 필드 배경색
+        "font-size: 14px;"
+        "}"
+        "QLineEdit:focus {"
+        "border-color: #4CAF50;"  // 포커스 시 테두리 색상 변경
+        "}"
+        "QLabel {"
+        "font-size: 14px;"
+        "color: #333;"
+        "}"
+        "QMessageBox {"
+        "font-size: 14px;"
+        "}"
+    );
+}
