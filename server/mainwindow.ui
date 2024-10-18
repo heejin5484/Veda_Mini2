@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>787</width>
-    <height>600</height>
+    <width>436</width>
+    <height>542</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="Login_button">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>140</y>
+      <x>310</x>
+      <y>390</y>
       <width>81</width>
       <height>71</height>
      </rect>
@@ -30,8 +30,8 @@
    <widget class="QLineEdit" name="ID_line">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>140</y>
+      <x>50</x>
+      <y>390</y>
       <width>241</width>
       <height>26</height>
      </rect>
@@ -40,24 +40,11 @@
    <widget class="QLineEdit" name="PW_line">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>180</y>
+      <x>50</x>
+      <y>430</y>
       <width>241</width>
       <height>26</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="Join_button">
-    <property name="geometry">
-     <rect>
-      <x>390</x>
-      <y>230</y>
-      <width>51</width>
-      <height>29</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Join</string>
     </property>
    </widget>
   </widget>
@@ -66,7 +53,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>787</width>
+     <width>436</width>
      <height>26</height>
     </rect>
    </property>
