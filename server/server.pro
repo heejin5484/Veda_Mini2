@@ -17,6 +17,7 @@ SOURCES += \
     chatserver.cpp \
     main.cpp \
     mainwindow.cpp \
+    messagehandler.cpp \
     videosender.cpp
 
 HEADERS += \
@@ -24,6 +25,7 @@ HEADERS += \
     chatroom.h \
     chatserver.h \
     mainwindow.h \
+    messagehandler.h \
     videosender.h
 
 FORMS += \

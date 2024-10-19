@@ -7,6 +7,7 @@
 #include <QBuffer>
 //#include "clientthread.h"
 #include "videosender.h"
+#include "messagehandler.h"
 
 ChatServer::ChatServer(QObject *parent)
     : QTcpServer(parent), mainwindow(nullptr)
@@ -36,32 +37,102 @@ void ChatServer::setMainWindow(MainWindow* window)
     qDebug() << "chatserver thread" << this->thread();
 }
 
-void ChatServer::incomingConnection(qintptr socketDescriptor) {
+void ChatServer::handleClientConnection(){
+    // clientServer로부터 새로운 연결을 받아 소켓을 생성
+    QTcpSocket* clientSocket = clientServer->nextPendingConnection();
 
-    // 소켓을 메인 스레드에서 생성
-    QTcpSocket* clientSocket = new QTcpSocket();
-    if (!clientSocket->setSocketDescriptor(socketDescriptor)) {
-        qDebug() << "Error: Could not set socket descriptor";
-        delete clientSocket;
+    if (!clientSocket) {
+        qDebug() << "Error: Could not retrieve pending connection";
         return;
     }
+    qDebug() << "New client connected for messaging.";
 
+    // JSON 데이터 읽기
+    if (clientSocket->waitForReadyRead(1000)) {
+        QByteArray data = clientSocket->readAll();
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
+        QJsonObject jsonObj = jsonDoc.object();
+        qDebug() << jsonObj;
+
+        if (jsonObj["type"].toString() == "message") {
+            // 비디오 소켓 처리
+            handleMessageSocket(clientSocket);
+        }
+        else {
+            qDebug() << "Unknown socket type";
+            clientSocket->disconnectFromHost();
+            clientSocket->deleteLater();
+        }
+    }
+    // 클라이언트로부터 데이터가 수신될 때 호출될 슬롯 연결
+    connect(clientSocket, &QTcpSocket::readyRead, this, [clientSocket]() {
+        QByteArray clientData = clientSocket->readAll();
+        qDebug() << "Received message data: " << clientData;
+        // 여기서 메시지 데이터를 처리하는 로직 추가
+    });
+
+}
+
+void ChatServer::handleVideoConnection(){
+    // videoServer로부터 새로운 연결을 받아 소켓을 생성
+    QTcpSocket* videoSocket = videoServer->nextPendingConnection();
+    if (!videoSocket) {
+        qDebug() << "Error: Could not retrieve pending connection";
+        return;
+    }
+    qDebug() << "New client connected for video.";
+
+    if (videoSocket->waitForReadyRead(1000)) {
+        QByteArray data = videoSocket->readAll();
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
+        QJsonObject jsonObj = jsonDoc.object();
+        qDebug() << jsonObj;
+
+        if (jsonObj["type"].toString() == "video") {
+            // 비디오 소켓 처리
+            handleVideoSocket(videoSocket);
+        } else {
+            qDebug() << "Unknown socket type";
+            videoSocket->disconnectFromHost();
+            videoSocket->deleteLater();
+        }
+    }
+}
+
+void ChatServer::incomingConnection(qintptr socketDescriptor) {
+
+    qDebug() << "a" ;
+}
+
+void ChatServer::handleMessageSocket(QTcpSocket* clientSocket){
+    qDebug() << "msg socket income";
+    //MessageHandler* messageHandler = new MessageHandler();
+    //messageHandler->setSocket(clientSocket);
+}
+
+void ChatServer::handleVideoSocket(QTcpSocket* socket){
+    // 소켓의 부모 관계를 끊음
+    socket->setParent(nullptr);
+
+    // 비디오 전송용 소켓
     // 새로운 스레드를 생성
-    QThread* thread = new QThread;
-    VideoSender* sender = new VideoSender();
-    sender->moveToThread(thread); // sender에서 QObject를 상속받을때 public으로 상속받았어야함..
+    qDebug() << "video socket income";
+    QThread* videoThread = new QThread;
+    VideoSender* videoSender = new VideoSender();
+    videoSender->moveToThread(videoThread);
     // 소켓을 스레드로 이동
-    clientSocket->moveToThread(thread);
-    sender->setSocket(clientSocket);
+    socket->moveToThread(videoThread);
 
-    // client 접속 끊기면 thread 종료하는거도 넣기
-
+    videoSender->setSocket(socket);
     // clientThread에서 유저 정보를 받을 수 있게 신호 연결
-    connect(this, &ChatServer::sendImageToClient, sender, &VideoSender::sendImage);
-    connect(sender, &VideoSender::disconnected, thread, &QThread::quit);
-    connect(thread,&QThread::finished, thread, &QThread::deleteLater);
+    connect(this, &ChatServer::sendImageToClient, videoSender, &VideoSender::sendImage);
+    connect(videoSender, &VideoSender::disconnected, videoThread, &QThread::quit);
+    connect(videoThread,&QThread::finished, videoThread, &QThread::deleteLater);
+    USER* user;
+    addClientToMap(videoSender, user);
+    videoThread->start();
 
-    thread->start();
+
 }
 
 // 유저 정보와 스레드를 clientMap에 추가하는 메서드
@@ -86,6 +157,7 @@ void ChatServer::removeClient(VideoSender* sender) {
 void ChatServer::onImageCaptured(int id, const QImage &image) {
     Q_UNUSED(id);
 
+    qDebug() << "captured";
     if (!clientMap.isEmpty()){
         // QImage -> JPEG
         QByteArray byteArray;
@@ -100,6 +172,7 @@ void ChatServer::onImageCaptured(int id, const QImage &image) {
 
         // 큐에 저장된 데이터를 처리하도록 호출
         broadcastImage();
+        qDebug() << "------";
     }
 }
 
@@ -160,3 +233,4 @@ void ChatServer::broadcastImage(){
         }
     }
 }
+

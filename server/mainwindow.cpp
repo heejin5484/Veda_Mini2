@@ -42,15 +42,29 @@ void MainWindow::LoginSuccess(){
 bool MainWindow::ServerOpen(int address){
     // ChatServer의 싱글톤 인스턴스에 접근
     ChatServer& server = ChatServer::instance();
-
     // MainWindow를 ChatServer에 전달
     server.setMainWindow(this);
 
-    if (!server.listen(QHostAddress::Any, address)){
+    // 메시지와 비디오 서버 생성
+    server.clientServer = new QTcpServer;
+    server.videoServer = new QTcpServer;
+
+    if (!server.clientServer->listen(QHostAddress::Any, address)){
         qDebug() << "Server could not start!";
         return false;
     }
     qDebug() << address << "Opened";
+
+    if (!server.videoServer->listen(QHostAddress::Any, address+1)){
+        qDebug() << "Server could not start!";
+        return false;
+    }
+    qDebug() << address+1 << "Opened";
+
+    // 클라이언트 연결 시그널과 슬롯 연결
+    connect(server.clientServer, &QTcpServer::newConnection, &server, &ChatServer::handleClientConnection);
+    connect(server.videoServer, &QTcpServer::newConnection, &server, &ChatServer::handleVideoConnection);
+
     return true;
 }
 

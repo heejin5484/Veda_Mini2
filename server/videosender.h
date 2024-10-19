@@ -21,7 +21,7 @@ signals:
     void disconnected();
 
 private:
-    QTcpSocket *clientSocket;  // 클라이언트 소켓
+    QTcpSocket *videoSocket;  // 클라이언트 소켓
     qintptr socketDescriptor;  // 소켓 디스크립터
     USER *user;
     bool isUserAuthenticated;

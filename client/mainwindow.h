@@ -20,6 +20,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     QTcpSocket *clientSocket;
+    QTcpSocket *videoSocket;
     QString id;
 
     void sendMsg(QString msg);
@@ -28,6 +29,7 @@ private slots:
 
     void on_connectButton_clicked();
     void onConnected();
+    void onConnected_vid();
     void failedConnect();
     void readMsg();
 

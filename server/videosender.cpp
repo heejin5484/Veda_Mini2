@@ -2,7 +2,7 @@
 
 VideoSender::VideoSender() : chatserver(ChatServer::instance())
 {
-    clientSocket = nullptr;
+    videoSocket = nullptr;
     isUserAuthenticated = false;
 }
 
@@ -14,60 +14,60 @@ VideoSender::~VideoSender() {
 }
 
 void VideoSender::setSocket(QTcpSocket* socket){
-    clientSocket = socket;
+    videoSocket = socket;
 
-    if (clientSocket == nullptr) {
+    if (videoSocket == nullptr) {
         qDebug() << "Error: No valid socket passed to thread";
         return;
     }
 
-    qDebug() << "clientSocket is in thread:" << clientSocket->thread();
+    qDebug() << "clientSocket is in thread:" << videoSocket->thread();
     qDebug() << "this thread:" << this->thread();
     qDebug() << "Current thread: " << QThread::currentThread();
 
-    connect(clientSocket, &QTcpSocket::readyRead, this, &VideoSender::onReadyRead);
-    connect(clientSocket, &QTcpSocket::disconnected, this, &VideoSender::onDisconnected);
+    connect(videoSocket, &QTcpSocket::readyRead, this, &VideoSender::onReadyRead);
+    connect(videoSocket, &QTcpSocket::disconnected, this, &VideoSender::onDisconnected);
 
     // 서버의 카메라이미지 준비신호와 연결
-    connect(&chatserver, &ChatServer::sendImageToClient, this, &VideoSender::sendImage);
+    connect(&ChatServer::instance(), &ChatServer::sendImageToClient, this, &VideoSender::sendImage);
 }
 
 void VideoSender::onReadyRead() {
-    QByteArray data = clientSocket->readAll();
+    QByteArray data = videoSocket->readAll();
     qDebug() << "Data received:" << data;
-    // 처음 읽는 데이터는 유저 정보로 가정
-    if (!isUserAuthenticated) {
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
-        QJsonObject jsonObj = jsonDoc.object();
+    // // 처음 읽는 데이터는 유저 정보로 가정
+    // if (!isUserAuthenticated) {
+    //     QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
+    //     QJsonObject jsonObj = jsonDoc.object();
 
-        QString id = jsonObj["ID"].toString();
-        QString password = jsonObj["password"].toString();
-        QString name = jsonObj["name"].toString();
+    //     QString id = jsonObj["ID"].toString();
+    //     QString password = jsonObj["password"].toString();
+    //     QString name = jsonObj["name"].toString();
 
-        if (!id.isEmpty()) {
-            // 유저 정보 생성
-            user = new USER{id, password, name, clientSocket};
-            qDebug() << "User authenticated:" << user->ID;
+    //     if (!id.isEmpty()) {
+    //         // 유저 정보 생성
+    //         user = new USER{id, password, name, clientSocket};
+    //         qDebug() << "User authenticated:" << user->ID;
 
-            // 서버에게 유저 정보 전달
-            emit ChatServer::instance().AddUser(user);  // 서버에 유저 정보 추가
-            ChatServer::instance().addClientToMap(this, user);  // clientMap에 추가
-            qDebug() << "videosender thread : " << this->thread();
-            qDebug() << "cur thread : " << QThread::currentThread();
+    //         // 서버에게 유저 정보 전달
+    //         emit ChatServer::instance().AddUser(user);  // 서버에 유저 정보 추가
+    //         ChatServer::instance().addClientToMap(this, user);  // clientMap에 추가
+    //         qDebug() << "videosender thread : " << this->thread();
+    //         qDebug() << "cur thread : " << QThread::currentThread();
 
-            isUserAuthenticated = true;  // 유저 인증 완료
-        } else {
-            qDebug() << "Invalid user information received";
-            clientSocket->disconnectFromHost();  // 연결 종료
-        }
-    } else {
+    //         isUserAuthenticated = true;  // 유저 인증 완료
+    //     } else {
+    //         qDebug() << "Invalid user information received";
+    //         clientSocket->disconnectFromHost();  // 연결 종료
+    //     }
+    // } else {
         // 유저 인증이 완료된 이후는 일반 데이터 처리
         qDebug() << "Data received:" << data;
 
         // 서버로부터 데이터 처리
-        emit ChatServer::instance().ProcessData(data, user);
+        //emit ChatServer::instance().ProcessData(data, user);
 
-    }
+
 }
 
 void VideoSender::onDisconnected() {
@@ -77,30 +77,30 @@ void VideoSender::onDisconnected() {
     ChatServer::instance().removeClient(this);  // 서버에게 클라이언트 삭제 요청
 
     // 스레드 종료 전 소켓을 안전하게 종료 ->> 삭제로 바꿔야할듯
-    if (clientSocket) {
+    if (videoSocket) {
         qDebug() << "Client disconnected, deleting socket.";
-        clientSocket->deleteLater();  // 안전하게 삭제
-        clientSocket = nullptr;  // 포인터를 nullptr로 설정하여 재사용 방지
+        videoSocket->deleteLater();  // 안전하게 삭제
+        videoSocket = nullptr;  // 포인터를 nullptr로 설정하여 재사용 방지
     }
     emit disconnected();
 }
 
 
 void VideoSender::sendImage(const QByteArray& image) {
-    if (clientSocket && clientSocket->state() == QAbstractSocket::ConnectedState) {
+    if (videoSocket && videoSocket->state() == QAbstractSocket::ConnectedState) {
         qDebug() << "----------------------------";
-        qDebug() << "clientSocket is in thread:" << clientSocket->thread();
+        qDebug() << "clientSocket is in thread:" << videoSocket->thread();
         qDebug() << "Current thread:" << QThread::currentThread();
-        QDataStream out(clientSocket);
+        QDataStream out(videoSocket);
         out.setVersion(QDataStream::Qt_5_15);
         int imageSize = image.size();
         out << imageSize;  // 이미지 크기 전송
         out.writeRawData(image.data(), imageSize);  // 이미지 데이터 전송
-        clientSocket->flush();  // 즉시 전송
-        clientSocket->waitForBytesWritten();  // 데이터가 전송될 때까지 대기
+        videoSocket->flush();  // 즉시 전송
+        videoSocket->waitForBytesWritten();  // 데이터가 전송될 때까지 대기
 
-        if (clientSocket->error() != QAbstractSocket::UnknownSocketError) {
-            qDebug() << "Socket error:" << clientSocket->errorString();
+        if (videoSocket->error() != QAbstractSocket::UnknownSocketError) {
+            qDebug() << "Socket error:" << videoSocket->errorString();
         }
         // 다른 스레드에서 안전하게 실행
     } else {

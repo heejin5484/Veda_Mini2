@@ -53,8 +53,14 @@ public:
     }
      void setMainWindow(MainWindow* window);
 
+    QTcpServer* clientServer;
+    QTcpServer* videoServer;
+
 public slots:
     void onImageCaptured(int id, const QImage &image);
+
+    void handleClientConnection();
+    void handleVideoConnection();
 /*
 private slots:
     void onNewConnection();
@@ -86,6 +92,11 @@ private:
     QQueue<QByteArray> imageQueue;    // 이미지 전송 큐
     QMutex messageMutex;              // 메시지 큐 락
     QMutex imageMutex;                // 이미지 큐 락
+
+    void handleMessageSocket(QTcpSocket* clientSocket);
+    void handleVideoSocket(QTcpSocket* clientSocket);
+
+
 
 };
 
