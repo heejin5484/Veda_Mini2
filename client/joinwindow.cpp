@@ -8,6 +8,43 @@ JoinWindow::JoinWindow(NetworkManager *networkManager, QWidget *parent) :
 {
     ui->setupUi(this);
     connect(networkManager, &NetworkManager::responseReceived, this, &JoinWindow::on_signupResponse);
+    connect(ui->togglePasswordButton, &QPushButton::clicked, this, &JoinWindow::togglePasswordVisibility);
+    setupEmailDomainComboBox();
+    this->setStyleSheet(
+        "QPushButton {"
+        "background-color: #4CAF50;"
+        "color: white;"
+        "border: none;"
+        "border-radius: 5px;"
+        "padding: 10px;"
+        "font-size: 16px;"
+        "}"
+        "QLineEdit {"
+        "border: 1px solid #ccc;"
+        "border-radius: 5px;"
+        "padding: 10px;"
+        "font-size: 14px;"  // 텍스트 크기 (입력된 텍스트 크기)
+        "}"
+        "QLineEdit::placeholder {"
+        "font-size: 12px;"  // 플레이스홀더 텍스트 크기
+        "color: #888;"  // 플레이스홀더 텍스트 색상 (선택 사항)
+        "}"
+        "QMessageBox {"
+        "font-size: 14px;"
+        "}"
+    );
+    // 플레이스홀더 텍스트
+    ui->nameLineEdit->setPlaceholderText("이름을 입력하세요");
+    ui->phoneLineEdit->setPlaceholderText("전화번호를 입력하세요");
+    ui->emailLineEdit->setPlaceholderText("이메일을 입력하세요");
+    ui->idLineEdit->setPlaceholderText("사용자 ID를 입력하세요");
+    ui->pwLineEdit->setPlaceholderText("비밀번호를 입력하세요");
+    ui->confirmPwLineEdit->setPlaceholderText("비밀번호 확인");
+
+        // 비밀번호 조건 표시
+    ui->passwordStrengthLabel->setText("비밀번호는 8자리 이상, 특수문자 포함해야 합니다.");
+    ui->passwordStrengthLabel->setStyleSheet("color: #888;");
+
 }
 
 JoinWindow::~JoinWindow()
@@ -52,6 +89,25 @@ void JoinWindow::on_joinBtn_clicked()
 
 }
 
+void JoinWindow::setupEmailDomainComboBox() {
+    // 이메일 도메인 목록
+    QStringList emailDomains = {"@gmail.com", "@yahoo.com", "@outlook.com", "@naver.com", "@daum.net"};
+
+    // QComboBox에 도메인 목록 추가
+    ui->emailDomainComboBox->addItems(emailDomains);
+
+    // 도메인 선택 시, 선택한 도메인을 이메일에 자동으로 추가
+    connect(ui->emailDomainComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &JoinWindow::onDomainSelected);
+}
+
+void JoinWindow::onDomainSelected(int index) {
+    // 사용자 이메일 입력란
+    QString userEmail = ui->emailLineEdit->text();
+
+    // 이메일 입력란에 도메인 추가 (기존에 입력된 이메일 앞에 추가)
+    QString domain = ui->emailDomainComboBox->currentText();
+    ui->emailLineEdit->setText(userEmail.split('@').first() + domain);
+}
 
 bool JoinWindow::isValidPassword(const QString &password)
 {
@@ -66,6 +122,17 @@ bool JoinWindow::isValidPassword(const QString &password)
     }
 
     return true;
+}
+
+void JoinWindow::togglePasswordVisibility() {
+    // 비밀번호 가시성 전환
+    if (ui->pwLineEdit->echoMode() == QLineEdit::Password) {
+        ui->pwLineEdit->setEchoMode(QLineEdit::Normal);  // 비밀번호 보이기
+        ui->confirmPwLineEdit->setEchoMode(QLineEdit::Normal);  // 비밀번호 확인 보이기
+    } else {
+        ui->pwLineEdit->setEchoMode(QLineEdit::Password);  // 비밀번호 숨기기
+        ui->confirmPwLineEdit->setEchoMode(QLineEdit::Password);  // 비밀번호 확인 숨기기
+    }
 }
 
 

@@ -20,11 +20,14 @@ public:
 
 private slots:
     void on_LoginButton_clicked();
+    void togglePasswordVisibility();
+    void handleServerResponse(bool success, const QString &message);
 
 private:
     Ui::LoginWindow *ui;
     NetworkManager *networkManager;
-    void handleServerResponse(bool success, const QString &message);
+    void applyStyles();
+    //void handleServerResponse(bool success, const QString &message);
 };
 
 #endif // LOGINWINDOW_H

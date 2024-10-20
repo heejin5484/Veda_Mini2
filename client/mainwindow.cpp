@@ -78,7 +78,7 @@ void MainWindow::onConnected()
         if (centralWidget()) {
             delete centralWidget();
         }
-        ui_chat = new chat(this);
+        ui_chat = new chat(networkManager, this);
         setCentralWidget(ui_chat);
         connect(ui_chat, &chat::sendMsg_sig,this,&MainWindow::sendMsg);
         connect(clientSocket, &QTcpSocket::readyRead, this, &MainWindow::readMsg);
