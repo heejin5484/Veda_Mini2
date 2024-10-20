@@ -21,6 +21,11 @@ typedef struct user {
     QTcpSocket *usersocket;
 } USER;
 
+struct CUser {
+    QString userid;
+    QString name;
+};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -30,7 +35,7 @@ public:
     ~MainWindow();
     QTcpSocket *clientSocket;
     QString id;
-    USER currentUser; // currentuser val
+    CUser currentUser;
     void sendMsg(QString msg);
     void setConnectButtonEnabled(bool enabled);
 

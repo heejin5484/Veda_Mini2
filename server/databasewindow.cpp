@@ -69,8 +69,49 @@ void DatabaseWindow::loadUsers() {
 
 
 void DatabaseWindow::loadMessages() {
+    if (!dbManager->openDatabase()) { // 데이터베이스 열기 시도
+        qDebug() << "Database could not be opened.";
+        return;
+    }
+
     // 메시지와 사용자 정보를 조인하여 가져옴
-    QSqlQuery query("SELECT messages.message, users.userid, messages.timestamp FROM messages JOIN users ON messages.user_id = users.id");
+    QSqlQuery query(dbManager->database()); // 올바른 db 객체 사용
+    query.prepare("SELECT log_messages.message, users.userid, log_messages.timestamp "
+                   "FROM log_messages "
+                   "JOIN users ON log_messages.userid = users.userid");
+    qDebug() << "Row count 1 :" << model->rowCount();  // 데이터가 몇 개인지 확인
+
+    if (!query.exec()) {
+        qDebug() << "Failed to load messages: " << query.lastError().text();
+        qDebug() << "Query: " << query.lastQuery();  // 마지막 실행된 쿼리 확인
+        return;  // 오류 발생 시 함수 종료
+    }
+
+    qDebug() << "Row count 2 :" << model->rowCount();  // 데이터가 몇 개인지 확인
+    if (model->rowCount() > 0) {
+        // 데이터가 있을 때만 fetch 수행
+        if (query.first()) {
+            do {
+                qDebug() << "Fetched message:" << query.value(0).toString()
+                         << ", User ID:" << query.value(1).toString()
+                         << ", Timestamp:" << query.value(2).toString();
+            } while (query.next());
+        }
+    }
+
+
+    // 쿼리 결과가 있는지 확인
+    if (!query.first()) {
+        qDebug() << "No messages found.";  // 메시지가 없을 때
+        return;
+    }
+
+
+
+
+
+
+    // 모델에 쿼리 세팅
     model->setQuery(query);
 
     // 열 제목 설정
@@ -81,6 +122,9 @@ void DatabaseWindow::loadMessages() {
     // 테이블 크기 조정
     ui->infoTable->resizeColumnsToContents();
 }
+
+
+
 
 void DatabaseWindow::loadMessagesByUser() {
     // 사용자 이름을 입력 받음

@@ -13,7 +13,13 @@ DatabaseManager::DatabaseManager(const QString &dbName) {
     }
 
     QString connectionName = QString("connection_%1").arg(reinterpret_cast<quintptr>(QThread::currentThread()));
-    db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+    if (QSqlDatabase::contains(connectionName)) {
+            db = QSqlDatabase::database(connectionName);
+        } else {
+            db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+        }
+
+
 
     // 절대 경로로 데이터베이스 파일 설정
     QString dbPath = dbName;
@@ -45,6 +51,7 @@ bool DatabaseManager::init() {
     }
 
     qDebug() << "Database opened successfully";
+
 
     // 테이블 생성 쿼리
     QSqlQuery query(db);
@@ -93,6 +100,29 @@ bool DatabaseManager::saveUserData(const QString& name, const QString& phone, co
     return true;
 }
 
+bool DatabaseManager::saveMessage(const QString& userid, const QString &message) {
+    if (!db.isOpen()) {
+        qDebug() << "Database not open.";
+        return false; // 데이터베이스가 열려 있지 않으면 실패
+    }
+
+    QSqlQuery query(db); // 열려 있는 데이터베이스를 사용하여 쿼리 생성
+    query.prepare("INSERT INTO log_messages (userid, message, timestamp) VALUES (:userid, :message, CURRENT_TIMESTAMP)");
+    query.bindValue(":userid", userid);
+    query.bindValue(":message", message);
+
+    // 바인딩된 값 로그 출력
+    qDebug() << "Binding values: userid:" << userid << ", message:" << message;
+
+    // 쿼리 실행
+    if (!query.exec()) {
+        qDebug() << "Failed to save message to database: " << query.lastError().text();
+        return false;
+    }
+    return true;
+}
+
+
 QSqlQuery DatabaseManager::loadUsers() {
     QSqlQuery query(db);
     if (!query.exec("SELECT name, phone, email, userid, password FROM users")) {
@@ -104,8 +134,11 @@ QSqlQuery DatabaseManager::loadUsers() {
 
 // 메시지 데이터를 로드하는 함수
 QSqlQuery DatabaseManager::loadMessages() {
+
+    openDatabase();
+
     QSqlQuery query(db);
-    if (!query.exec("SELECT messages.message, users.userid, messages.timestamp FROM messages JOIN users ON messages.user_id = users.id")) {
+    if (!query.exec("SELECT messages.message, users.userid, messages.timestamp FROM log_messages JOIN users ON log_messages.userid = users.userid")) {
         qDebug() << "Message loading error:" << query.lastError().text();  // 오류 메시지 출력
     }
     return query;  // 쿼리 결과 반환
@@ -120,10 +153,22 @@ DatabaseManager::~DatabaseManager() {
     close(); // 데이터베이스 닫기
 }
 
+bool DatabaseManager::openDatabase() {
+    if (!db.isOpen()) {
+        if (!db.open()) {
+            qDebug() << "Failed to open database: " << db.lastError().text();
+            return false; // 데이터베이스 열기에 실패한 경우
+        }
+        qDebug() << "Database opened successfully";
+    }
+    return true;
+}
+
+
 void DatabaseManager::close() {
     if (db.isOpen()) {
         db.close();
         qDebug() << "Database connection closed.";
     }
-    //QSqlDatabase::removeDatabase(db.connectionName()); // 연결 이름을 사용하여 제거
+    QSqlDatabase::removeDatabase(db.connectionName()); // 연결 이름을 사용하여 제거
 }

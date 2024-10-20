@@ -15,6 +15,8 @@ LoginWindow::LoginWindow(NetworkManager *networkManager, QWidget *parent) :
     applyStyles();
     connect(networkManager, &NetworkManager::responseReceived, this, &LoginWindow::handleServerResponse);
     connect(ui->togglePasswordButton, &QPushButton::clicked, this, &LoginWindow::togglePasswordVisibility);
+
+
 }
 
 LoginWindow::~LoginWindow()
@@ -43,36 +45,43 @@ void LoginWindow::on_LoginButton_clicked()
 }
 
 // login success func
-void LoginWindow::handleServerResponse(bool success, const QString &message) {
+void LoginWindow::handleServerResponse(bool success, const QString &message, const QString &userId, const QString &name)
+{
+    qDebug() << "성공 여부:" << success;
+    qDebug() << "서버에서 수신한 메시지:" << message;
+    qDebug() << "id:" << userId;
+    qDebug() << "name:" << name;
+
     if (success) {
-        // JSON 응답을 파싱하여 사용자 정보 저장
-        QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
-        QJsonObject jsonObj = doc.object();
+            // JSON 응답을 파싱하여 사용자 정보 저장
+            QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
+            QJsonObject jsonObj = doc.object();
 
-        // MainWindow에 사용자 정보 설정
-        MainWindow *mainWindow = static_cast<MainWindow*>(parent());
-        if (mainWindow) {
+            // MainWindow에 사용자 정보 설정
+            MainWindow *mainWindow = static_cast<MainWindow*>(parent());
+            if (mainWindow) {
 
-            mainWindow->currentUser.userid = jsonObj["userid"].toString();
-            mainWindow->currentUser.name = jsonObj["name"].toString();
-            mainWindow->currentUser.password = jsonObj["password"].toString(); // 비밀번호는 일반적으로 안전을 위해 저장하지 않는 것이 좋습니다.
+                mainWindow->currentUser.userid = userId;
+                mainWindow->currentUser.name = name;
 
-            qDebug() << "로그인 성공! 유저 아이디: " << mainWindow->currentUser.userid;
-            qDebug() << "로그인 성공! 유저 이름: " << mainWindow->currentUser.name;
+                qDebug() << "로그인 성공! 유저 아이디: " << mainWindow->currentUser.userid;
+                qDebug() << "로그인 성공! 유저 이름: " << mainWindow->currentUser.name;
 
-            //QMessageBox::information(this, "로그인 성공", "환영합니다, " + mainWindow->currentUser.name + "님!");
+                QMessageBox::information(this, "로그인 성공", "환영합니다, " + mainWindow->currentUser.name + "님!");
 
-            mainWindow->setConnectButtonEnabled(true);
+                mainWindow->setConnectButtonEnabled(true);
+            }
+
+            QMessageBox::information(this, "로그인 성공", "로그인에 성공했습니다.");
+            accept(); // 로그인 성공 시 창 닫기
         }
+        else {
+            QMessageBox::warning(this, "로그인 실패", message);
+        }
+ }
 
-        QMessageBox::information(this, "로그인 성공", "로그인에 성공했습니다.");
-        accept(); // 로그인 성공 시 창 닫기
-    } else {
-        QMessageBox::warning(this, "로그인 실패", message);
-    }
-}
+
 void LoginWindow::togglePasswordVisibility() {
-    // 비밀번호 가시성 전환
     if (ui->passwordLineEdit->echoMode() == QLineEdit::Password) {
         ui->passwordLineEdit->setEchoMode(QLineEdit::Normal);  // 비밀번호 보이기
     } else {

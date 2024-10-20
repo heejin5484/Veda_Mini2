@@ -46,19 +46,20 @@ void NetworkManager::sendMessage(const QJsonObject &json) {
 
 void NetworkManager::onReadyRead() {
     while (socket->canReadLine()) {
-        QByteArray line = socket->readLine();
-        qDebug() << "수신한 응답:" << line; // 응답 내용을 로그로 확인
+        QByteArray line = socket->readLine().trimmed(); // 개행 문자 제거
+        qDebug() << "수신한 응답 !!:" << line; // 수신된 응답 로그 출력
 
         QJsonDocument jsonDoc = QJsonDocument::fromJson(line);
-        if (jsonDoc.isNull()) {
-            qDebug() << "서버 응답을 JSON으로 파싱하지 못했습니다:" << line; // 에러 메시지 추가
-            return; // JSON 파싱 실패 시 함수 종료
-        }
+            if (!jsonDoc.isNull()) {
+                QJsonObject jsonObj = jsonDoc.object();
+                bool success = jsonObj["status"] == "success";
+                QString message = jsonObj["message"].toString();
+                QString userId = jsonObj["userid"].toString();
+                QString name = jsonObj["name"].toString();
 
-        QJsonObject jsonObj = jsonDoc.object();
-        bool success = jsonObj["status"] == "success";
-        QString message = jsonObj["message"].toString();
-
-        emit responseReceived(success, message); // 회원가입 응답 시그널 전송
+                emit responseReceived(success, message, userId, name); // 성공 여부와 메시지 전달
+            } else {
+                emit responseReceived(false, "서버 응답을 JSON으로 파싱하지 못했습니다.", "", ""); // 실패 시 메시지 전달
+            }
     }
 }

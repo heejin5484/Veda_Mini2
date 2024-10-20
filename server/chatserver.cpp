@@ -40,7 +40,10 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
                 processSignupRequest(jsonObj, clientSocket); // 가입 요청 처리
             } else if (type == "L") {
                 processLoginRequest(jsonObj, clientSocket); // 로그인 요청 처리
-            } else if (type == "M") {
+            } else if(type == "C") {
+
+            }
+            else if (type == "M") {
                 processMessageRequest(jsonObj, clientSocket); // 메시지 요청 처리
             } else {
                 sendResponse(clientSocket, "error", "잘못된 요청 유형입니다.");
@@ -176,8 +179,27 @@ void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *cli
 
 void ChatServer::processMessageRequest(const QJsonObject &jsonObj, QTcpSocket *clientSocket) {
     QString message = jsonObj["message"].toString();
-    sendResponse(clientSocket, "success", "메시지 수신 완료");
+    QString userid = jsonObj["userid"].toString(); // 사용자 ID를 추가로 가져옵니다
+    qDebug() << "메시지 수신: " << message << " 사용자 ID: " << userid;
+
+    // 데이터베이스 매니저 인스턴스 생성
+    DatabaseManager dbManager("users.db");
+    if (!dbManager.init()) {
+        sendResponse(clientSocket, "error", "데이터베이스 초기화 실패.");
+        return; // 초기화 실패 시 응답 후 종료
+    }
+
+    // 메시지 저장
+    if (dbManager.saveMessage(userid, message)) {
+        sendResponse(clientSocket, "success", "메시지 수신 완료 및 저장되었습니다.");
+    } else {
+        sendResponse(clientSocket, "error", "메시지 저장 실패.");
+    }
+
+    dbManager.close(); // 연결 종료
 }
+
+
 
 void ChatServer::sendResponse(QTcpSocket *clientSocket, const QString &status, const QString &message) {
     QJsonObject responseJson;
@@ -185,7 +207,7 @@ void ChatServer::sendResponse(QTcpSocket *clientSocket, const QString &status, c
     responseJson["message"] = message; // 응답 메시지
     QJsonDocument responseDoc(responseJson);
     QByteArray responseData = responseDoc.toJson(QJsonDocument::Compact);
-    qDebug() << "서버 응답 전송:" << responseData; // JSON 응답 디버깅 출력
+    qDebug() << "서버 응답 전송!:" << responseData; // JSON 응답 디버깅 출력
     clientSocket->write(responseData + "\n"); // 개행 문자 추가
     clientSocket->flush();  // 데이터 전송 완료를 보장
 }
@@ -193,7 +215,7 @@ void ChatServer::sendResponse(QTcpSocket *clientSocket, const QString &status, c
 void ChatServer::sendResponse(QTcpSocket *clientSocket, const QJsonObject &responseJson) {
     QJsonDocument responseDoc(responseJson);
     QByteArray responseData = responseDoc.toJson(QJsonDocument::Compact);
-    qDebug() << "서버 응답 전송:" << responseData; // JSON 응답 디버깅 출력
+    qDebug() << "서버 응답 전송!!:" << responseData; // JSON 응답 디버깅 출력
     clientSocket->write(responseData + "\n"); // 개행 문자 추가
     clientSocket->flush();  // 데이터 전송 완료를 보장
 }
