@@ -53,8 +53,6 @@ void LoginWindow::handleServerResponse(bool success, const QString &message) {
             mainWindow->currentUser.userid = jsonObj["userid"].toString();
             mainWindow->currentUser.name = jsonObj["name"].toString();
             mainWindow->currentUser.password = jsonObj["password"].toString(); // 비밀번호는 일반적으로 안전을 위해 저장하지 않는 것이 좋습니다.
-
-            QMessageBox::information(this, "로그인 성공", "환영합니다, " + mainWindow->currentUser.name + "님!");
             mainWindow->setConnectButtonEnabled(true);
         }
 
