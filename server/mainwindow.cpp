@@ -11,6 +11,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
+#include "rtpprocess.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -35,6 +36,13 @@ void MainWindow::LoginSuccess(){
     chatroom = new chatRoom(this);
     setCentralWidget(chatroom);
 
+    // 싱글톤 객체를 통해 FFmpeg 멀티캐스트 스트리밍 시작
+    rtpProcess::instance()->startFFmpegProcess();
+
+    // 1분 후 스트리밍 종료 (나중에 수정)
+    QTimer::singleShot(60000, []() {
+        rtpProcess::instance()->stopFFmpegProcess();
+    });
     connect(this, &MainWindow::NewUserAdd, chatroom, &chatRoom::addUserList);
     connect(this, &MainWindow::DisconnectUser, chatroom, &chatRoom::deleteUserList);
 }

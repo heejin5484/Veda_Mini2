@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "ui_chat.h"
 #include "chat.h"
 #include "networkmanager.h"
 #include <QDebug>
@@ -82,6 +83,7 @@ void MainWindow::onConnected()
         setCentralWidget(ui_chat);
         connect(ui_chat, &chat::sendMsg_sig,this,&MainWindow::sendMsg);
         connect(clientSocket, &QTcpSocket::readyRead, this, &MainWindow::readMsg);
+
     });
 }
 

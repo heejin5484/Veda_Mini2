@@ -17,6 +17,7 @@ SOURCES += \
     databasewindow.cpp \
     main.cpp \
     mainwindow.cpp \
+    rtpprocess.cpp \
     databasemanager.cpp
 
 HEADERS += \
@@ -25,6 +26,7 @@ HEADERS += \
     constants.h \
     databasewindow.h \
     mainwindow.h \
+    rtpprocess.h \
     databasemanager.h
 
 FORMS += \

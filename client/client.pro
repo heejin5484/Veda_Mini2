@@ -17,14 +17,16 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     networkmanager.cpp \
-    joinwindow.cpp
+    joinwindow.cpp \
+    rtpclient.cpp
 
 HEADERS += \
     chat.h \
     loginwindow.h \
     mainwindow.h \
     networkmanager.h \
-    joinwindow.h
+    joinwindow.h \
+    rtpclient.h
 
 FORMS += \
     chat.ui \

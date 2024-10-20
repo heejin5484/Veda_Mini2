@@ -3,13 +3,18 @@
 #include "mainwindow.h"
 #include <QString>
 #include <QDateTime>
-
+#include "rtpclient.h"
 chat::chat(NetworkManager *networkManager, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::chat)
     , networkManager(networkManager)
 {
     ui->setupUi(this);
+    // rtpClient의 videoLabel에 ui_chat의 videoLabel 연결
+    rtpClient::instance()->videoLabel = ui->video_label;
+    // FFmpeg 프로세스 시작
+    rtpClient::instance()->startFFmpegProcess();
+    qDebug() << "start ffmpeg";
     connect(ui->sendButton,&QPushButton::clicked,this,&chat::onSendButtonClicked);
     connect(qobject_cast<MainWindow*>(this->parent()), &MainWindow::deliverMsg, this, &chat::recieveMsg);
 }

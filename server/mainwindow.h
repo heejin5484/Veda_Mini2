@@ -5,7 +5,6 @@
 #include <QListWidget>
 #include <QTcpServer>
 #include "chatserver.h"
-
 class chatRoom;
 
 QT_BEGIN_NAMESPACE
@@ -41,6 +40,5 @@ private:
     chatRoom *chatroom;
     void ServerOpen(int address);
     QMap<QString, USER*> UserMap;
-
 };
 #endif // MAINWINDOW_H
