@@ -6,80 +6,182 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1116</width>
-    <height>701</height>
+    <width>1057</width>
+    <height>542</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1116</width>
-    <height>701</height>
+    <width>1052</width>
+    <height>532</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(255, 255, 255);</string>
+  </property>
   <widget class="QListWidget" name="userList">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>550</y>
-     <width>641</width>
-     <height>131</height>
+     <x>480</x>
+     <y>70</y>
+     <width>151</width>
+     <height>241</height>
     </rect>
    </property>
-  </widget>
-  <widget class="QTextEdit" name="textEdit">
-   <property name="geometry">
-    <rect>
-     <x>670</x>
-     <y>30</y>
-     <width>431</width>
-     <height>481</height>
-    </rect>
+   <property name="styleSheet">
+    <string notr="true">background-color: 
+qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(55, 55, 55, 150), stop:1 rgba(22, 22, 22, 150));
+
+border-radius:10px;
+border-style:
+    solid;
+border-width:
+1px;
+border-color: rgba(255, 255, 255,120)
+
+   
+</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit">
+  <widget class="QTextEdit" name="chatLog">
    <property name="geometry">
     <rect>
-     <x>670</x>
-     <y>520</y>
-     <width>431</width>
-     <height>121</height>
+     <x>660</x>
+     <y>70</y>
+     <width>381</width>
+     <height>331</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: 
+rgb(255, 255, 255);
+border-radius:
+10px;
+border-style:
+    solid;
+border-width:
+0px;
+border-color: rgba(120, 120, 120,120)
+
+   
+</string>
+   </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QLineEdit" name="lineEdit_chat">
    <property name="geometry">
     <rect>
-     <x>670</x>
-     <y>650</y>
-     <width>291</width>
+     <x>660</x>
+     <y>400</y>
+     <width>381</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: 
+rgb(245, 245, 245);
+border-radius:
+10px;
+border-style:
+    solid;
+border-width:
+1px;
+border-color: rgba(120, 120, 120,120)
+
+   
+</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="chatButton">
+   <property name="geometry">
+    <rect>
+     <x>950</x>
+     <y>500</y>
+     <width>91</width>
      <height>31</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>나눔스퀘어OTF_ac Bold</family>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color : rgb(255, 255, 255);
+ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 203, 241, 255), stop:0.14 rgba(255, 203, 241, 255), stop:0.21 rgba(255, 203, 241, 255), stop:0.31 rgba(255, 203, 241, 255), stop:0.89 rgba(190, 247, 255, 255), stop:0.98 rgba(181, 189, 253,255), stop:1 rgba(181, 189, 253,255));
+border-radius:
+15px;
+border-style:
+    solid;
+border-width:
+1px;
+border-color: rgba(120, 120, 120,120)
+
+   
+
+</string>
+   </property>
    <property name="text">
-    <string>Send</string>
+    <string>Chat</string>
    </property>
   </widget>
   <widget class="QPushButton" name="managerButton">
    <property name="geometry">
     <rect>
-     <x>970</x>
-     <y>650</y>
-     <width>131</width>
+     <x>660</x>
+     <y>500</y>
+     <width>31</width>
      <height>31</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: 
+rgb(255, 255, 255);
+border-radius:
+10px;
+border-style:
+    solid;
+border-width:
+0px;
+border-color: rgba(120, 120, 120,120)
+
+   
+</string>
+   </property>
    <property name="text">
-    <string>Manager</string>
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/images/images/option_icon.png</normaloff>:/images/images/option_icon.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>25</width>
+     <height>25</height>
+    </size>
    </property>
   </widget>
   <widget class="QLabel" name="video_label">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>30</y>
+     <x>0</x>
+     <y>60</y>
      <width>640</width>
      <height>480</height>
     </rect>
@@ -91,39 +193,183 @@
     </size>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(203, 203, 203);</string>
+    <string notr="true">background-color: rgb(237, 237, 237);
+border-radius:
+15px;
+border-style:
+    solid;
+border-width:
+    0px;
+border-color: 
+rgb(188, 188, 188);
+   
+</string>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="ppl_num">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>490</y>
+     <width>21</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>나눔스퀘어_ac ExtraBold</family>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(255, 255, 255,0);
+</string>
+   </property>
+   <property name="text">
+    <string>0</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="ui_background">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>60</y>
+     <width>401</width>
+     <height>481</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 255, 255);
+border-radius:
+15px;
+border-style:
+    solid;
+border-width:
+    1px;
+border-color: 
+rgb(188, 188, 188);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="ppl_icon">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>500</y>
+     <width>31</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: 
+rgba(255, 255, 255,0);
+border-radius:
+0px;
+border-width:
+0px;
+border-color: rgba(120, 120, 120,120)
+
+   
+</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="resources.qrc">:/images/images/user_icon.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>20</y>
+     <width>281</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>나눔스퀘어_ac ExtraBold</family>
+     <pointsize>13</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(255, 255, 255, 0);
+color: rgb(255,255,255);
+/*color: qlineargradient(x1:0, y1:0, x2:200, y2:0, stop:0.3 #ffcbf1, stop:0.45 #bef7ff, stop:1 #cc98f9);*/</string>
+   </property>
+   <property name="text">
+    <string>VEDA CHAT</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>520</y>
-     <width>521</width>
-     <height>20</height>
+     <x>10</x>
+     <y>20</y>
+     <width>21</width>
+     <height>21</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+   </property>
    <property name="text">
-    <string>User List</string>
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="resources.qrc">:/images/images/video_icon2.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>670</x>
-     <y>0</y>
-     <width>371</width>
-     <height>20</height>
+     <x>0</x>
+     <y>10</y>
+     <width>1051</width>
+     <height>41</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">border-radius:
+15px;
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 203, 241, 255), stop:0.14 rgba(255, 203, 241, 255), stop:0.21 rgba(255, 203, 241, 255), stop:0.21 rgba(255, 203, 241, 255), stop:0.89 rgba(190, 247, 255, 255), stop:0.98 rgba(181, 189, 253,255), stop:1 rgba(181, 189, 253,255));</string>
+   </property>
    <property name="text">
-    <string>Chat Log</string>
+    <string/>
    </property>
   </widget>
+  <zorder>label_3</zorder>
+  <zorder>ui_background</zorder>
+  <zorder>video_label</zorder>
+  <zorder>chatLog</zorder>
+  <zorder>lineEdit_chat</zorder>
+  <zorder>chatButton</zorder>
+  <zorder>managerButton</zorder>
+  <zorder>ppl_num</zorder>
+  <zorder>userList</zorder>
+  <zorder>label</zorder>
+  <zorder>label_2</zorder>
+  <zorder>ppl_icon</zorder>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

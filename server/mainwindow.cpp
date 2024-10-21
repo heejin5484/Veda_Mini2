@@ -34,7 +34,13 @@ void MainWindow::on_Login_button_clicked()
 void MainWindow::LoginSuccess(){
     ServerOpen(SERVER_PORT);
     chatroom = new chatRoom(this);
+    // 크기 정책 설정
+    chatroom->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     setCentralWidget(chatroom);
+
+    // MainWindow의 최소 크기 설정 (chatroom의 크기 이하로 내려가지않도록
+    setMinimumSize(1057, 570);
 
     // 싱글톤 객체를 통해 FFmpeg 멀티캐스트 스트리밍 시작
     rtpProcess::instance()->startFFmpegProcess();
