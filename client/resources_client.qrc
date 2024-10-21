@@ -15,5 +15,8 @@
         <file>image/video_icon3.png</file>
         <file>image/video_icon4.png</file>
         <file>image/video_icon5.png</file>
+        <file>image/shop_icon.png</file>
+        <file>image/eye_icon.png</file>
+        <file>image/x_icon.png</file>
     </qresource>
 </RCC>
