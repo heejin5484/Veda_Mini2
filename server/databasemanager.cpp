@@ -5,86 +5,109 @@
 #include <QSqlError>
 #include <QDebug>
 
-DatabaseManager::DatabaseManager(const QString &dbName) {
-    // SQLite 드라이버 로드
+DatabaseManager::DatabaseManager(const QString &userDbName, const QString &chatDbName) {
+    // SQLite 드라이버 확인
     if (!QSqlDatabase::isDriverAvailable("QSQLITE")) {
         qDebug() << "SQLite 드라이버를 로드할 수 없습니다.";
         return;
     }
 
-    QString connectionName = QString("connection_%1").arg(reinterpret_cast<quintptr>(QThread::currentThread()));
-    if (QSqlDatabase::contains(connectionName)) {
-            db = QSqlDatabase::database(connectionName);
-        } else {
-            db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
-        }
+    // 각각의 스레드에 맞는 연결 이름 설정
+    QString userConnectionName = QString("user_connection_%1").arg(reinterpret_cast<quintptr>(QThread::currentThread()));
+    QString chatConnectionName = QString("chat_connection_%1").arg(reinterpret_cast<quintptr>(QThread::currentThread()));
 
+    // 유저 DB 설정
+    if (QSqlDatabase::contains(userConnectionName)) {
+        userDb = QSqlDatabase::database(userConnectionName);
+    } else {
+        userDb = QSqlDatabase::addDatabase("QSQLITE", userConnectionName);
+    }
+    userDb.setDatabaseName(userDbName);
 
+    // 채팅 DB 설정
+    if (QSqlDatabase::contains(chatConnectionName)) {
+        chatDb = QSqlDatabase::database(chatConnectionName);
+    } else {
+        chatDb = QSqlDatabase::addDatabase("QSQLITE", chatConnectionName);
+    }
+    chatDb.setDatabaseName(chatDbName);
 
-    // 절대 경로로 데이터베이스 파일 설정
-    QString dbPath = dbName;
-    db.setDatabaseName(dbPath);
-
-    qDebug() << "Database path set to:" << db.databaseName();
+    qDebug() << "User DB path set to:" << userDb.databaseName();
+    qDebug() << "Chat DB path set to:" << chatDb.databaseName();
 
     // 데이터베이스 파일이 없다면 생성
-       if (!QFile::exists(dbPath)) {
-           QFile file(dbPath);
-           if (!file.open(QIODevice::ReadWrite)) {
-               qDebug() << "Failed to create database file:" << file.errorString();
-               return;
-           }
-           file.close();
-       }
+    if (!QFile::exists(userDbName)) {
+        QFile file(userDbName);
+        if (!file.open(QIODevice::ReadWrite)) {
+            qDebug() << "Failed to create user database file:" << file.errorString();
+            return;
+        }
+        file.close();
+    }
 
-       // 데이터베이스 초기화
-       if (!init()) {
-           qDebug() << "Database initialization failed.";
-       }
+    if (!QFile::exists(chatDbName)) {
+        QFile file(chatDbName);
+        if (!file.open(QIODevice::ReadWrite)) {
+            qDebug() << "Failed to create chat database file:" << file.errorString();
+            return;
+        }
+        file.close();
+    }
+
+    // 데이터베이스 초기화
+    if (!init()) {
+        qDebug() << "Database initialization failed.";
+    }
 }
 
 bool DatabaseManager::init() {
-    // 데이터베이스 열기
-    if (!db.open()) {
-        qDebug() << "Database not opened:" << db.lastError().text();
+    // 유저 테이블 생성
+    if (!userDb.open()) {
+        qDebug() << "User database not opened:" << userDb.lastError().text();
         return false;
     }
 
-    qDebug() << "Database opened successfully";
+    QSqlQuery userQuery(userDb);
+    if (!userQuery.exec("CREATE TABLE IF NOT EXISTS users ("
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        "name TEXT, "
+                        "phone TEXT, "
+                        "email TEXT, "
+                        "userid TEXT UNIQUE, "
+                        "password TEXT, "
+                        "type TEXT)")) {
+        qDebug() << "Failed to create users table: " << userQuery.lastError().text();
+        return false;
+    }
 
+    // 채팅 테이블 생성
+    if (!chatDb.open()) {
+        qDebug() << "Chat database not opened:" << chatDb.lastError().text();
+        return false;
+    }
 
-    // 테이블 생성 쿼리
-    QSqlQuery query(db);
-    if (!query.exec("CREATE TABLE IF NOT EXISTS users ("
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    "name TEXT, "
-                    "phone TEXT, "
-                    "email TEXT, "
-                    "userid TEXT UNIQUE, "
-                    "password TEXT, "
-                    "type TEXT)")) {
-        qDebug() << "Failed to create table: " << query.lastError().text();
+    QSqlQuery chatQuery(chatDb);
+    if (!chatQuery.exec("CREATE TABLE IF NOT EXISTS chats ("
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        "userid TEXT, "
+                        "message TEXT, "
+                        "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")) {
+        qDebug() << "Failed to create log_messages table: " << chatQuery.lastError().text();
         return false;
     }
 
     return true;
 }
 
-
-bool DatabaseManager::saveUserData(const QString& name, const QString& phone, const QString& email, const QString& userid, const QString& password, const QString& type)
-{
-
-    if (!db.isOpen()) {
-            qDebug() << "Database is not open.";
-            return false;
+// 유저 데이터 저장 함수
+bool DatabaseManager::saveUserData(const QString& name, const QString& phone, const QString& email, const QString& userid, const QString& password, const QString& type) {
+    if (!userDb.isOpen()) {
+        qDebug() << "User database is not open.";
+        return false;
     }
 
-    QSqlQuery query(db);  // 로컬 쿼리 생성
+    QSqlQuery query(userDb);
     query.prepare("INSERT INTO users (name, phone, email, userid, password, type) VALUES (?, ?, ?, ?, ?, ?)");
-
-    // 바인딩 값 출력 및 바인딩
-    qDebug() << "Binding values:" << name << phone << email << userid << password << type;
-
     query.addBindValue(name);
     query.addBindValue(phone);
     query.addBindValue(email);
@@ -92,7 +115,6 @@ bool DatabaseManager::saveUserData(const QString& name, const QString& phone, co
     query.addBindValue(password);
     query.addBindValue(type);
 
-    // 쿼리 실행
     if (!query.exec()) {
         qDebug() << "Insert error:" << query.lastError().text();
         return false;
@@ -100,75 +122,61 @@ bool DatabaseManager::saveUserData(const QString& name, const QString& phone, co
     return true;
 }
 
+
 bool DatabaseManager::saveMessage(const QString& userid, const QString &message) {
-    if (!db.isOpen()) {
-        qDebug() << "Database not open.";
-        return false; // 데이터베이스가 열려 있지 않으면 실패
+    if (!chatDb.isOpen()) {
+        qDebug() << "Chat database not open.";
+        return false;
     }
 
-    QSqlQuery query(db); // 열려 있는 데이터베이스를 사용하여 쿼리 생성
-    query.prepare("INSERT INTO log_messages (userid, message, timestamp) VALUES (:userid, :message, CURRENT_TIMESTAMP)");
-    query.bindValue(":userid", userid);
-    query.bindValue(":message", message);
+    QSqlQuery query(chatDb);
+    query.prepare("INSERT INTO chats (userid, message, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)");
+    query.addBindValue(userid);
+    query.addBindValue(message);
 
-    // 바인딩된 값 로그 출력
-    qDebug() << "Binding values: userid:" << userid << ", message:" << message;
-
-    // 쿼리 실행
     if (!query.exec()) {
-        qDebug() << "Failed to save message to database: " << query.lastError().text();
+        qDebug() << "Insert error:" << query.lastError().text();
         return false;
     }
     return true;
 }
 
 
+// 유저 데이터 로드 함수
 QSqlQuery DatabaseManager::loadUsers() {
-    QSqlQuery query(db);
+    QSqlQuery query(userDb);
     if (!query.exec("SELECT name, phone, email, userid, password FROM users")) {
-        qDebug() << "Query execution error:" << query.lastError().text();  // 오류 메시지 출력
+        qDebug() << "User data loading error:" << query.lastError().text();
     }
-    return query;  // 쿼리 결과 반환
+    return query;
 }
 
-
-// 메시지 데이터를 로드하는 함수
+// 채팅 메시지 로드 함수
 QSqlQuery DatabaseManager::loadMessages() {
-
-    openDatabase();
-
-    QSqlQuery query(db);
-    if (!query.exec("SELECT messages.message, users.userid, messages.timestamp FROM log_messages JOIN users ON log_messages.userid = users.userid")) {
-        qDebug() << "Message loading error:" << query.lastError().text();  // 오류 메시지 출력
+    QSqlQuery query(chatDb);
+    if (!query.exec("SELECT message, userid, timestamp FROM chats")) {
+        qDebug() << "Message loading error:" << query.lastError().text();
     }
-    return query;  // 쿼리 결과 반환
+    return query;
 }
 
-// 추가된 멤버 함수
-QSqlDatabase DatabaseManager::database() const {
-    return db;  // 데이터베이스 객체를 반환
+void DatabaseManager::close() {
+    if (userDb.isOpen()) {
+        userDb.close();
+        qDebug() << "User database connection closed.";
+    }
+    if (chatDb.isOpen()) {
+        chatDb.close();
+        qDebug() << "Chat database connection closed.";
+    }
 }
 
 DatabaseManager::~DatabaseManager() {
-    close(); // 데이터베이스 닫기
-}
-
-bool DatabaseManager::openDatabase() {
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            qDebug() << "Failed to open database: " << db.lastError().text();
-            return false; // 데이터베이스 열기에 실패한 경우
-        }
-        qDebug() << "Database opened successfully";
-    }
-    return true;
+    close();
 }
 
 
-void DatabaseManager::close() {
-    if (db.isOpen()) {
-        db.close();
-        qDebug() << "Database connection closed.";
-    }
-    QSqlDatabase::removeDatabase(db.connectionName()); // 연결 이름을 사용하여 제거
+
+QSqlDatabase DatabaseManager::database() const {
+    return userDb;  // 데이터베이스 객체를 반환
 }
