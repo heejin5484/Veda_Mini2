@@ -164,6 +164,7 @@ void ChatServer::processMessageRequest(const QJsonObject &jsonObj, QTcpSocket *c
     QString userid = jsonObj["userid"].toString();
     QString name = jsonObj["name"].toString();
     qDebug() << "메시지 수신: " << message << " 사용자 ID: " << userid;
+    emit messageReceived(userid + ": " + message); // 메시지 방출
 
     // DatabaseManager 인스턴스 생성 시 유저와 채팅 DB를 모두 전달
     DatabaseManager dbManager("users.db", "chats.db");
@@ -174,12 +175,14 @@ void ChatServer::processMessageRequest(const QJsonObject &jsonObj, QTcpSocket *c
 
     if (dbManager.saveMessage(name, userid, message)) {
         sendResponse(clientSocket, "success", "메시지 저장 완료.");
+        qDebug() << "emit faill:" << message; // 디버깅 출력
     } else {
         sendResponse(clientSocket, "error", "메시지 저장 실패.");
     }
 
     dbManager.close();
 }
+
 
 void ChatServer::sendResponse(QTcpSocket *clientSocket, const QString &status, const QString &message) const {
     QJsonObject responseJson;
