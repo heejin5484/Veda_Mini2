@@ -77,10 +77,7 @@ void MainWindow::DataIncome(QByteArray data, USER *user){
                 }
             }
         }
-
-
 }
-
 
 void MainWindow::UserDisconnected(USER *usr){
     if (UserMap.contains(usr->userid)){
@@ -99,7 +96,5 @@ void MainWindow::UserDisconnected(USER *usr){
 void MainWindow::closeEvent(QCloseEvent *event) {
     // FFmpeg 스트리밍 종료
     rtpProcess::instance()->stopFFmpegProcess();
-
-    // 부모 클래스의 closeEvent를 호출하여 창을 정상적으로 종료
     QMainWindow::closeEvent(event);
 }

@@ -36,7 +36,6 @@ signals :
 private:
     Ui::MainWindow *ui;
     void LoginSuccess();
-    //ChatServer *server;
     chatRoom *chatroom;
     void ServerOpen(int address);
     QMap<QString, USER*> UserMap;

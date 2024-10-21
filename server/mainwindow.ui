@@ -116,10 +116,10 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>50</y>
-      <width>241</width>
-      <height>211</height>
+      <x>70</x>
+      <y>40</y>
+      <width>261</width>
+      <height>261</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -129,7 +129,10 @@
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap resource="resources.qrc">:/images/images/video_icon2.png</pixmap>
+     <pixmap resource="resources.qrc">:/images/images/video_icon4.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
     </property>
     <property name="alignment">
      <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -138,8 +141,8 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>230</y>
+      <x>70</x>
+      <y>180</y>
       <width>271</width>
       <height>61</height>
      </rect>
@@ -147,7 +150,7 @@
     <property name="font">
      <font>
       <family>나눔스퀘어OTF_ac ExtraBold</family>
-      <pointsize>22</pointsize>
+      <pointsize>20</pointsize>
       <bold>true</bold>
      </font>
     </property>
@@ -165,6 +168,11 @@ color: qlineargradient(x1:0, y1:0, x2:200, y2:0, stop:0.3 #ffcbf1, stop:0.45 #be
      <set>Qt::AlignmentFlag::AlignCenter</set>
     </property>
    </widget>
+   <zorder>label</zorder>
+   <zorder>Login_button</zorder>
+   <zorder>ID_line</zorder>
+   <zorder>PW_line</zorder>
+   <zorder>label_2</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="maximumSize">

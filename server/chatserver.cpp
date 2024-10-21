@@ -171,9 +171,6 @@ void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *cli
     dbManager.close(); // 연결 종료
 }
 
-
-
-
 void ChatServer::processMessageRequest(const QJsonObject &jsonObj, QTcpSocket *clientSocket) {
     QString message = jsonObj["message"].toString();
     sendResponse(clientSocket, "success", "메시지 수신 완료");

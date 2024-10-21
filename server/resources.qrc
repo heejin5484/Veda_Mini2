@@ -4,5 +4,16 @@
         <file>images/video_icon2.png</file>
         <file>images/option_icon.png</file>
         <file>images/user_icon.png</file>
+        <file>images/video_icon3.png</file>
+        <file>images/circle.png</file>
+        <file>images/video_icon4.png</file>
+        <file>images/option_icon2.png</file>
+        <file>images/video_icon5.png</file>
+        <file>images/user_icon2.png</file>
+        <file>images/ppl_icon.png</file>
+        <file>images/ppl_icon2.png</file>
+        <file>images/ppl_icon3.png</file>
+        <file>images/send_icon.png</file>
+        <file>images/send_icon2.png</file>
     </qresource>
 </RCC>
