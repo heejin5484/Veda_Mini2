@@ -117,7 +117,7 @@ void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *cli
         return;
     }
 
-    QSqlQuery query(dbManager.database());
+    QSqlQuery query(dbManager.userDatabase());
     query.prepare("SELECT name, password FROM users WHERE userid = :userid");
     query.bindValue(":userid", userid);
 
@@ -162,6 +162,7 @@ void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *cli
 void ChatServer::processMessageRequest(const QJsonObject &jsonObj, QTcpSocket *clientSocket) {
     QString message = jsonObj["message"].toString();
     QString userid = jsonObj["userid"].toString();
+    QString name = jsonObj["name"].toString();
     qDebug() << "메시지 수신: " << message << " 사용자 ID: " << userid;
 
     // DatabaseManager 인스턴스 생성 시 유저와 채팅 DB를 모두 전달
@@ -171,7 +172,7 @@ void ChatServer::processMessageRequest(const QJsonObject &jsonObj, QTcpSocket *c
         return;
     }
 
-    if (dbManager.saveMessage(userid, message)) {
+    if (dbManager.saveMessage(name, userid, message)) {
         sendResponse(clientSocket, "success", "메시지 저장 완료.");
     } else {
         sendResponse(clientSocket, "error", "메시지 저장 실패.");

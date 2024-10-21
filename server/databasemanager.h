@@ -14,12 +14,13 @@ public:
 
 
     bool saveUserData(const QString& name, const QString& phone, const QString& email, const QString& userid, const QString& password, const QString& type);
-    bool saveMessage(const QString& userid, const QString &message);
+    bool saveMessage(const QString& name, const QString& userid, const QString &message);
     QSqlQuery loadUsers();
     QSqlQuery loadMessages();
 
     bool init();
-    QSqlDatabase database() const;
+    QSqlDatabase userDatabase() const;
+    QSqlDatabase chatDatabase() const;
     bool openDatabase();
     void close();
 

@@ -19,20 +19,17 @@ public:
 
 private slots:
     void onFilterChanged(const QString &filter);
+    void refreshData();
 
 private:
     Ui::DatabaseWindow *ui;  // UI 연결
     DatabaseManager *dbManager;  // DatabaseManager 포인터
     QSqlQueryModel *model;  // 테이블 데이터를 관리할 모델
 
-    // 사용자 정보를 불러오는 함수
     void loadUsers();
-
-    // 모든 메시지 정보를 불러오는 함수
     void loadMessages();
-
-    // 특정 사용자의 메시지를 불러오는 함수
     void loadMessagesByUser();
+    void loadMessagesByKeyword();
 };
 
 #endif // DATABASEWINDOW_H

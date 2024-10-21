@@ -85,10 +85,10 @@ bool DatabaseManager::init() {
         qDebug() << "Chat database not opened:" << chatDb.lastError().text();
         return false;
     }
-
     QSqlQuery chatQuery(chatDb);
     if (!chatQuery.exec("CREATE TABLE IF NOT EXISTS chats ("
                         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        "name TEXT, "
                         "userid TEXT, "
                         "message TEXT, "
                         "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")) {
@@ -123,14 +123,15 @@ bool DatabaseManager::saveUserData(const QString& name, const QString& phone, co
 }
 
 
-bool DatabaseManager::saveMessage(const QString& userid, const QString &message) {
+bool DatabaseManager::saveMessage(const QString& name, const QString& userid, const QString &message) {
     if (!chatDb.isOpen()) {
         qDebug() << "Chat database not open.";
         return false;
     }
 
     QSqlQuery query(chatDb);
-    query.prepare("INSERT INTO chats (userid, message, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)");
+    query.prepare("INSERT INTO chats (name, userid, message, timestamp) VALUES (?, ?, ?, CURRENT_TIMESTAMP)");
+    query.addBindValue(name);
     query.addBindValue(userid);
     query.addBindValue(message);
 
@@ -153,10 +154,19 @@ QSqlQuery DatabaseManager::loadUsers() {
 
 // 채팅 메시지 로드 함수
 QSqlQuery DatabaseManager::loadMessages() {
+
+    if (!userDb.tables().contains("users")) {
+            qDebug() << "Users table does not exist.";
+            return QSqlQuery(); // 빈 QSqlQuery 반환
+        }
+
     QSqlQuery query(chatDb);
-    if (!query.exec("SELECT message, userid, timestamp FROM chats")) {
-        qDebug() << "Message loading error:" << query.lastError().text();
-    }
+    QString sql = "SELECT chats.name, chats.userid, chats.message, chats.timestamp "
+                      "FROM chats ";
+
+    if (!query.exec(sql)) {
+            qDebug() << "Message loading error:" << query.lastError().text();
+        }
     return query;
 }
 
@@ -177,6 +187,12 @@ DatabaseManager::~DatabaseManager() {
 
 
 
-QSqlDatabase DatabaseManager::database() const {
-    return userDb;  // 데이터베이스 객체를 반환
+QSqlDatabase DatabaseManager::userDatabase() const {
+    return userDb;
 }
+
+
+QSqlDatabase DatabaseManager::chatDatabase() const {
+    return chatDb;
+}
+
