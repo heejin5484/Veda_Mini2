@@ -21,6 +21,7 @@ public slots:
     void showContextMenu(const QPoint &pos);
     void addUserList(QString id);
     void deleteUserList(QString id);
+    void onNewFrameAvailable(const QImage& frame);
 
 private slots:
     void on_managerButton_clicked();

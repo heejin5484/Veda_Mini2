@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>980</width>
+    <width>1116</width>
     <height>701</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>980</width>
+    <width>1116</width>
     <height>701</height>
    </size>
   </property>
@@ -23,18 +23,18 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>580</y>
-     <width>531</width>
-     <height>91</height>
+     <y>550</y>
+     <width>641</width>
+     <height>131</height>
     </rect>
    </property>
   </widget>
   <widget class="QTextEdit" name="textEdit">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>60</y>
-     <width>391</width>
+     <x>670</x>
+     <y>30</y>
+     <width>431</width>
      <height>481</height>
     </rect>
    </property>
@@ -42,18 +42,18 @@
   <widget class="QLineEdit" name="lineEdit">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>580</y>
-     <width>391</width>
-     <height>51</height>
+     <x>670</x>
+     <y>520</y>
+     <width>431</width>
+     <height>121</height>
     </rect>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>640</y>
+     <x>670</x>
+     <y>650</y>
      <width>291</width>
      <height>31</height>
     </rect>
@@ -65,9 +65,9 @@
   <widget class="QPushButton" name="managerButton">
    <property name="geometry">
     <rect>
-     <x>870</x>
-     <y>640</y>
-     <width>89</width>
+     <x>970</x>
+     <y>650</y>
+     <width>131</width>
      <height>31</height>
     </rect>
    </property>
@@ -75,14 +75,20 @@
     <string>Manager</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="video_label">
    <property name="geometry">
     <rect>
      <x>20</x>
      <y>30</y>
-     <width>531</width>
-     <height>511</height>
+     <width>640</width>
+     <height>480</height>
     </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>640</width>
+     <height>480</height>
+    </size>
    </property>
    <property name="styleSheet">
     <string notr="true">background-color: rgb(203, 203, 203);</string>
@@ -95,7 +101,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>550</y>
+     <y>520</y>
      <width>521</width>
      <height>20</height>
     </rect>
@@ -107,8 +113,8 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>580</x>
-     <y>30</y>
+     <x>670</x>
+     <y>0</y>
      <width>371</width>
      <height>20</height>
     </rect>

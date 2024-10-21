@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <QImage>
 #include <QLabel>
-
+#include <QDir>
 rtpClient* rtpClient::instance() {
     static rtpClient instance;
     return &instance;
@@ -21,16 +21,45 @@ void rtpClient::readFFmpegOutput() {
     // raw RGB 데이터로 가정하고 QImage로 변환
     if (data.size() >= 640 * 480 * 3) {  // 해상도 640x480에 대해 RGB는 3바이트 픽셀
         QImage image(reinterpret_cast<const uchar*>(data.data()), 640, 480, QImage::Format_RGB888);
-        videoLabel->setPixmap(QPixmap::fromImage(image).scaled(videoLabel->size(), Qt::KeepAspectRatio));
+
+        // QLabel의 크기
+        QSize labelSize = videoLabel->size();
+
+        // 이미지의 크기
+        QSize imageSize = image.size();
+        // 이미지와 QLabel의 종횡비 비교
+        QRect targetRect;
+        if (static_cast<float>(imageSize.width()) / imageSize.height() > static_cast<float>(labelSize.width()) / labelSize.height()) {
+            // 이미지가 가로로 더 길면 좌우를 잘라냄
+            int newWidth = static_cast<int>(imageSize.height() * static_cast<float>(labelSize.width()) / labelSize.height());
+            int xOffset = (imageSize.width() - newWidth) / 2;
+            targetRect = QRect(xOffset, 0, newWidth, imageSize.height());
+        } else {
+            // 이미지가 세로로 더 길면 위아래를 잘라냄
+            int newHeight = static_cast<int>(imageSize.width() * static_cast<float>(labelSize.height()) / labelSize.width());
+            int yOffset = (imageSize.height() - newHeight) / 2;
+            targetRect = QRect(0, yOffset, imageSize.width(), newHeight);
+        }
+
+        // 이미지를 잘라냄
+        QImage croppedImage = image.copy(targetRect);
+        QPixmap pixmap =  QPixmap::fromImage(croppedImage).scaled(labelSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+        videoLabel->setPixmap(pixmap);
     }
 }
+
 
 void rtpClient::startFFmpegProcess() {
     ffmpegProcess = new QProcess();
 
-    // FFmpeg 실행 경로 및 명령어 설정 (ffmpeg 설치된 경로로 바꿔야함)
-    QString program = "C:/ffmpeg/ffmpeg-n5.1-latest-win64-gpl-shared-5.1/bin/ffmpeg.exe";
+    #if 1 // window환경
+    // FFmpeg 실행 경로 및 명령어 설정
+    QString program = QDir::currentPath() + "/bin/ffmpeg.exe";
+    qDebug() << program;
     QStringList arguments;
+    #else // linux환경
+    // 추가필요
+    #endif
 
     // FFmpeg 명령어 설정 (rawvideo를 stdout으로 출력하도록)
     arguments << "-protocol_whitelist" << "file,udp,rtp"

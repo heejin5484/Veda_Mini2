@@ -21,7 +21,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     QTcpServer *server;
-
+    void closeEvent(QCloseEvent *event) override;
 
 public slots:
     void on_Login_button_clicked();

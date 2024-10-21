@@ -2,7 +2,7 @@
 #include "ui_chatroom.h"
 #include "databasewindow.h"
 #include <QMenu>
-
+#include "rtpprocess.h"
 chatRoom::chatRoom(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::chatRoom)
@@ -11,14 +11,17 @@ chatRoom::chatRoom(QWidget *parent)
 
     ui->userList->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->userList, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showContextMenu(QPoint)));
+    connect(rtpProcess::instance(), &rtpProcess::newFrameAvailable, this, &chatRoom::onNewFrameAvailable);
 }
-
 
 chatRoom::~chatRoom()
 {
     delete ui;
 }
 
+void chatRoom::onNewFrameAvailable(const QImage& frame) {
+    ui->video_label->setPixmap(QPixmap::fromImage(frame));
+}
 
 void chatRoom::showContextMenu(const QPoint &pos) {
     QListWidgetItem *item = ui->userList->itemAt(pos);

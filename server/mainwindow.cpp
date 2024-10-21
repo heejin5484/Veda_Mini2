@@ -39,10 +39,6 @@ void MainWindow::LoginSuccess(){
     // 싱글톤 객체를 통해 FFmpeg 멀티캐스트 스트리밍 시작
     rtpProcess::instance()->startFFmpegProcess();
 
-    // 1분 후 스트리밍 종료 (나중에 수정)
-    QTimer::singleShot(60000, []() {
-        rtpProcess::instance()->stopFFmpegProcess();
-    });
     connect(this, &MainWindow::NewUserAdd, chatroom, &chatRoom::addUserList);
     connect(this, &MainWindow::DisconnectUser, chatroom, &chatRoom::deleteUserList);
 }
@@ -92,4 +88,12 @@ void MainWindow::UserDisconnected(USER *usr){
     }
     delete usr;
     qDebug() << "User object deleted";
+}
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+    // FFmpeg 스트리밍 종료
+    rtpProcess::instance()->stopFFmpegProcess();
+
+    // 부모 클래스의 closeEvent를 호출하여 창을 정상적으로 종료
+    QMainWindow::closeEvent(event);
 }
