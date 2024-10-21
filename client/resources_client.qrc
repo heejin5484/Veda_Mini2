@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/image">
+        <file>image/circle.png</file>
+        <file>image/option_icon.png</file>
+        <file>image/option_icon2.png</file>
+        <file>image/ppl_icon.png</file>
+        <file>image/ppl_icon2.png</file>
+        <file>image/ppl_icon3.png</file>
+        <file>image/send_icon.png</file>
+        <file>image/send_icon2.png</file>
+        <file>image/user_icon.png</file>
+        <file>image/user_icon2.png</file>
+        <file>image/video_icon.png</file>
+        <file>image/video_icon2.png</file>
+        <file>image/video_icon3.png</file>
+        <file>image/video_icon4.png</file>
+        <file>image/video_icon5.png</file>
+    </qresource>
+</RCC>

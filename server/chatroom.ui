@@ -81,7 +81,7 @@ QListWidget::item:selected {
      <string>user1</string>
     </property>
     <property name="icon">
-     <iconset resource="resources.qrc">
+     <iconset>
       <normaloff>:/images/images/ppl_icon3.png</normaloff>:/images/images/ppl_icon3.png</iconset>
     </property>
    </item>
@@ -90,7 +90,7 @@ QListWidget::item:selected {
      <string>user2</string>
     </property>
     <property name="icon">
-     <iconset resource="resources.qrc">
+     <iconset>
       <normaloff>:/images/images/ppl_icon3.png</normaloff>:/images/images/ppl_icon3.png</iconset>
     </property>
    </item>
@@ -237,7 +237,7 @@ border-color: rgba(120, 120, 120,120)
     <string/>
    </property>
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset>
      <normaloff>:/images/images/option_icon2.png</normaloff>:/images/images/option_icon2.png</iconset>
    </property>
    <property name="iconSize">
@@ -355,7 +355,7 @@ border-color: rgba(120, 120, 120,120)
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="resources.qrc">:/images/images/user_icon2.png</pixmap>
+    <pixmap>:/images/images/user_icon2.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>
@@ -407,7 +407,7 @@ color: rgb(255,255,255);
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="resources.qrc">:/images/images/video_icon5.png</pixmap>
+    <pixmap>:/images/images/video_icon5.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>
@@ -447,7 +447,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgb
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="resources.qrc">:/images/images/video_icon5.png</pixmap>
+    <pixmap>:/images/images/video_icon5.png</pixmap>
    </property>
    <property name="indent">
     <number>-4</number>
@@ -525,8 +525,6 @@ color: rgb(122, 122, 122)</string>
   <zorder>ppl_icon</zorder>
   <zorder>userList</zorder>
  </widget>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

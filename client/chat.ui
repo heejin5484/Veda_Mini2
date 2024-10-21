@@ -65,7 +65,7 @@
     <string notr="true">background-color: rgb(124, 124, 124);</string>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string/>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton">
