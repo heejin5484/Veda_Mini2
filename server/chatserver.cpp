@@ -165,7 +165,7 @@ void ChatServer::processMessageRequest(const QJsonObject &jsonObj, QTcpSocket *c
     QString name = jsonObj["name"].toString();
     qDebug() << "메시지 수신: " << message << " 사용자 ID: " << userid;
     emit messageReceived(userid + ": " + message); // 메시지 방출
-
+    qDebug() << "signal Message received:" << message;
     // DatabaseManager 인스턴스 생성 시 유저와 채팅 DB를 모두 전달
     DatabaseManager dbManager("users.db", "chats.db");
     if (!dbManager.init()) {
