@@ -16,6 +16,7 @@
 #include <QFile>
 #include "databasemanager.h"
 
+class chatRoom;
 class MainWindow;
 
 typedef struct user{
@@ -36,15 +37,16 @@ public:
 protected:
     void incomingConnection(qintptr socketDescriptor) override;
 
-private slots:
     void processSignupRequest(const QJsonObject &jsonObj, QTcpSocket *clientSocket);
     void processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *clientSocket);
     void processMessageRequest(const QJsonObject &jsonObj, QTcpSocket *clientSocket);
-    void sendResponse(QTcpSocket *clientSocket, const QString &status, const QString &message);
-    void sendResponse(QTcpSocket *clientSocket, const QJsonObject &responseJson);
+    void sendResponse(QTcpSocket *clientSocket, const QString &status, const QString &message) const;
+    void sendResponse(QTcpSocket *clientSocket, const QJsonObject &responseJson) const;
+
 signals:
-    void AddUser(USER *user);
-    void DisconnectUser(USER *user);
+    void AddUser(USER *user);       // 사용자 추가 시 발생하는 시그널
+    void DisconnectUser(USER *user); // 사용자 연결 해제 시 발생하는 시그널
+    void messageReceived(const QString &message);
 
 private:
     MainWindow *mainwindow;

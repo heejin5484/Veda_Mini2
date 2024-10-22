@@ -38,7 +38,7 @@ void chat::onSendButtonClicked(){
     ui->msgLine->clear();
 
 
-        // 채팅 메시지를 서버로 보낼 JSON 객체 생성
+     // 채팅 메시지를 서버로 보낼 JSON 객체 생성
     QJsonObject json;
     json["type"] = "M";  // 메시지 유형
     json["userid"] = userid;  // 사용자 ID

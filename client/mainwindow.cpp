@@ -63,9 +63,9 @@ void MainWindow::onConnected()
 
     // 연결된 직후 USER 정보를 서버로 전송 (나중에 수정)
     QJsonObject userInfo;
-    userInfo["ID"] = id;  // 클라이언트 ID
+    userInfo["ID"] = currentUser.userid;  // 클라이언트 ID
     userInfo["password"] = "1234";  // 예시 비밀번호
-    userInfo["name"] = "TestName";  // 예시 이름
+    userInfo["name"] = currentUser.name;  // 예시 이름
 
     QJsonDocument doc(userInfo);
     QByteArray userData = doc.toJson(QJsonDocument::Compact);

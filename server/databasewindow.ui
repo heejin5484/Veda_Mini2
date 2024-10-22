@@ -42,11 +42,24 @@
   <widget class="QComboBox" name="filterComboBox">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>40</y>
-     <width>86</width>
+     <x>340</x>
+     <y>50</y>
+     <width>191</width>
      <height>25</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="refreshButton">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>50</y>
+     <width>89</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>refresh</string>
    </property>
   </widget>
  </widget>

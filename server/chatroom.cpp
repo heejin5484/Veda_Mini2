@@ -8,8 +8,10 @@ chatRoom::chatRoom(QWidget *parent)
     , ui(new Ui::chatRoom)
 {
     ui->setupUi(this);
-
     ui->userList->setContextMenuPolicy(Qt::CustomContextMenu);
+    chatServer = new ChatServer(this);
+    connect(chatServer, &ChatServer::messageReceived, this, &chatRoom::onMessageReceived);
+    qDebug() << "Signal connected!";
     connect(ui->userList, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showContextMenu(QPoint)));
     connect(rtpProcess::instance(), &rtpProcess::newFrameAvailable, this, &chatRoom::onNewFrameAvailable);
 }
@@ -69,6 +71,14 @@ void chatRoom::on_managerButton_clicked()
 {
     DatabaseWindow *dbWindow = new DatabaseWindow(this);
     dbWindow->exec();
-
 }
+
+void chatRoom::onMessageReceived(const QString &message)
+{
+    qDebug() << "emit 수신한 메시지:" << message; // 디버깅 출력
+    ui->textEdit->append(message);
+    //QMetaObject::invokeMethod(ui->textEdit, "append", Qt::QueuedConnection, Q_ARG(QString, message));
+}
+
+
 

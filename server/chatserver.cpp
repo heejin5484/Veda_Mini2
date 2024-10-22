@@ -20,7 +20,7 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
     clientSocket->setSocketDescriptor(socketDescriptor);
 
     QThread *thread = new QThread;
-    clientSocket->moveToThread(thread); // 소켓을 새 스레드로 이동
+    clientSocket->moveToThread(thread);
 
     threadList.append(thread); // 스레드 목록에 추가
 
@@ -28,7 +28,7 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
         qDebug() << "새 스레드에서 클라이언트 연결됨";
 
         connect(clientSocket, &QTcpSocket::readyRead, [=]() {
-            QByteArray data = clientSocket->readAll(); // 수신 데이터 읽기
+            QByteArray data = clientSocket->readAll();
             qDebug() << "수신한 사용자 데이터:" << data;
 
             QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
@@ -72,22 +72,19 @@ void ChatServer::processSignupRequest(const QJsonObject &jsonObj, QTcpSocket *cl
     QString phone = jsonObj["phone"].toString();
     QString email = jsonObj["email"].toString();
 
-    if (!userid.isEmpty())
-    {
-        USER *user = new USER; // USER 구조체 인스턴스 생성
+    if (!userid.isEmpty()) {
+        USER *user = new USER;
         user->userid = userid;
         user->password = password;
         user->name = name;
         user->usersocket = clientSocket;
 
-        //emit AddUser(user); // AddUser 시그널 발생
-
-        DatabaseManager dbManager("users.db"); // 여기서 데이터베이스 매니저를 새로 생성
+        // DatabaseManager 인스턴스 생성 시 유저와 채팅 DB를 모두 전달
+        DatabaseManager dbManager("users.db", "chats.db");
         if (!dbManager.init()) {
-            sendResponse(clientSocket, "error", "데이터베이스 초기화 실패.");
-            return; // 초기화 실패 시 응답 후 종료
+            sendResponse(clientSocket, "error", "유저 데이터베이스 초기화 실패.");
+            return;
         }
-
 
         bool saveSuccess = dbManager.saveUserData(name, phone, email, userid, password, "J");
         if (saveSuccess) {
@@ -98,17 +95,13 @@ void ChatServer::processSignupRequest(const QJsonObject &jsonObj, QTcpSocket *cl
             sendResponse(clientSocket, "error", "가입에 실패했습니다.");
         }
 
-        dbManager.close(); // 연결 종료
+        dbManager.close();
         delete user;
 
-    }
-    else
-    {
+    } else {
         qDebug() << "잘못된 사용자 ID 수신";
         clientSocket->disconnectFromHost();
     }
-
-
 }
 
 void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *clientSocket) {
@@ -117,39 +110,36 @@ void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *cli
 
     qDebug() << "로그인 요청 수신: " << userid;
 
-    DatabaseManager dbManager("users.db"); // 데이터베이스 매니저 인스턴스 생성
+    DatabaseManager dbManager("users.db", "chats.db");
 
     if (!dbManager.init()) {
-        sendResponse(clientSocket, "error", "데이터베이스 초기화 실패.");
-        return; // 초기화 실패 시 응답 후 종료
+        sendResponse(clientSocket, "error", "유저 데이터베이스 초기화 실패.");
+        return;
     }
 
-    // 쿼리 실행
-    QSqlQuery query(dbManager.database()); // DatabaseManager에서 db를 가져옵니다.
-    query.prepare("SELECT name, password FROM users WHERE userid = :userid"); // 이름도 선택
+    QSqlQuery query(dbManager.userDatabase());
+    query.prepare("SELECT name, password FROM users WHERE userid = :userid");
     query.bindValue(":userid", userid);
 
     if (!query.exec()) {
-        qDebug() << "Query execution error:" << query.lastError().text();
+        qDebug() << "쿼리 실행 오류:" << query.lastError().text();
         sendResponse(clientSocket, "error", "쿼리 실행 오류.");
-        return; // 쿼리 실행 실패 시 응답 후 종료
+        return;
     }
 
     if (query.next()) {
-        QString storedName = query.value(0).toString(); // 데이터베이스에서 이름 가져오기
-        QString storedPassword = query.value(1).toString(); // 데이터베이스에서 비밀번호 가져오기
-        qDebug() << "Stored name:" << storedName;
-        qDebug() << "Stored password:" << storedPassword;
+        QString storedName = query.value(0).toString();
+        QString storedPassword = query.value(1).toString();
+        qDebug() << "저장된 이름:" << storedName;
+        qDebug() << "저장된 비밀번호:" << storedPassword;
 
         if (storedPassword == password) {
-            // 로그인 성공 시 USER 구조체 인스턴스 생성
             USER *user = new USER;
-            user->userid = userid; // 사용자 ID 설정
-            user->password = password; // 비밀번호 설정
-            user->name = storedName; // 사용자 이름 설정
-            user->usersocket = clientSocket; // 클라이언트 소켓 설정
+            user->userid = userid;
+            user->password = password;
+            user->name = storedName;
+            user->usersocket = clientSocket;
 
-            // 클라이언트에게 성공 응답과 함께 이름, ID, 비밀번호 전송
             QJsonObject responseJson;
             responseJson["status"] = "success";
             responseJson["message"] = "로그인 성공";
@@ -157,41 +147,58 @@ void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *cli
             responseJson["name"] = user->name;
             responseJson["password"] = user->password;
             emit AddUser(user);
-            qDebug() << "User added to server: " << user->userid;
-            sendResponse(clientSocket, responseJson); // JSON 객체 전송
-        }
-        else {
+            qDebug() << "서버에 추가된 사용자: " << user->userid;
+            sendResponse(clientSocket, responseJson);
+        } else {
             sendResponse(clientSocket, "fail", "비밀번호가 틀렸습니다.");
         }
-    }
-    else {
+    } else {
         sendResponse(clientSocket, "error", "가입되지 않은 사용자입니다.");
     }
 
-    dbManager.close(); // 연결 종료
+    dbManager.close();
 }
 
 void ChatServer::processMessageRequest(const QJsonObject &jsonObj, QTcpSocket *clientSocket) {
     QString message = jsonObj["message"].toString();
-    sendResponse(clientSocket, "success", "메시지 수신 완료");
+    QString userid = jsonObj["userid"].toString();
+    QString name = jsonObj["name"].toString();
+    qDebug() << "메시지 수신: " << message << " 사용자 ID: " << userid;
+    emit messageReceived(userid + ": " + message); // 메시지 방출
+    qDebug() << "signal Message received:" << message;
+    // DatabaseManager 인스턴스 생성 시 유저와 채팅 DB를 모두 전달
+    DatabaseManager dbManager("users.db", "chats.db");
+    if (!dbManager.init()) {
+        sendResponse(clientSocket, "error", "채팅 데이터베이스 초기화 실패.");
+        return;
+    }
+
+    if (dbManager.saveMessage(name, userid, message)) {
+        sendResponse(clientSocket, "success", "메시지 저장 완료.");
+        qDebug() << "emit faill:" << message; // 디버깅 출력
+    } else {
+        sendResponse(clientSocket, "error", "메시지 저장 실패.");
+    }
+
+    dbManager.close();
 }
 
-void ChatServer::sendResponse(QTcpSocket *clientSocket, const QString &status, const QString &message) {
+
+void ChatServer::sendResponse(QTcpSocket *clientSocket, const QString &status, const QString &message) const {
     QJsonObject responseJson;
     responseJson["status"] = status; // 예: "success"
     responseJson["message"] = message; // 응답 메시지
     QJsonDocument responseDoc(responseJson);
     QByteArray responseData = responseDoc.toJson(QJsonDocument::Compact);
-    qDebug() << "서버 응답 전송:" << responseData; // JSON 응답 디버깅 출력
+    qDebug() << "서버 응답 전송!:" << responseData; // JSON 응답 디버깅 출력
     clientSocket->write(responseData + "\n"); // 개행 문자 추가
     clientSocket->flush();  // 데이터 전송 완료를 보장
 }
 
-void ChatServer::sendResponse(QTcpSocket *clientSocket, const QJsonObject &responseJson) {
+void ChatServer::sendResponse(QTcpSocket *clientSocket, const QJsonObject &responseJson) const {
     QJsonDocument responseDoc(responseJson);
     QByteArray responseData = responseDoc.toJson(QJsonDocument::Compact);
-    qDebug() << "서버 응답 전송:" << responseData; // JSON 응답 디버깅 출력
+    qDebug() << "서버 응답 전송!!:" << responseData; // JSON 응답 디버깅 출력
     clientSocket->write(responseData + "\n"); // 개행 문자 추가
     clientSocket->flush();  // 데이터 전송 완료를 보장
 }
-

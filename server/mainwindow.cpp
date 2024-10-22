@@ -47,6 +47,7 @@ void MainWindow::LoginSuccess(){
 
     connect(this, &MainWindow::NewUserAdd, chatroom, &chatRoom::addUserList);
     connect(this, &MainWindow::DisconnectUser, chatroom, &chatRoom::deleteUserList);
+    //connect(server,&ChatServer::messageReceived, chatroom, &chatRoom::onMessageReceived);
 }
 
 void MainWindow::ServerOpen(int address) {
