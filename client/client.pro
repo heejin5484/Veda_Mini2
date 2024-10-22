@@ -17,14 +17,16 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     networkmanager.cpp \
-    joinwindow.cpp
+    joinwindow.cpp \
+    rtpclient.cpp
 
 HEADERS += \
     chat.h \
     loginwindow.h \
     mainwindow.h \
     networkmanager.h \
-    joinwindow.h
+    joinwindow.h \
+    rtpclient.h
 
 FORMS += \
     chat.ui \
@@ -36,3 +38,6 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    resources_client.qrc

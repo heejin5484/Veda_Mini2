@@ -7,69 +7,200 @@
     <x>0</x>
     <y>0</y>
     <width>535</width>
-    <height>523</height>
+    <height>731</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <property name="layoutDirection">
-   <enum>Qt::LeftToRight</enum>
+   <enum>Qt::LayoutDirection::LeftToRight</enum>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(255, 255, 255);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="connectButton">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>140</y>
-      <width>91</width>
-      <height>24</height>
+      <x>160</x>
+      <y>430</y>
+      <width>191</width>
+      <height>51</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>나눔스퀘어라운드OTF ExtraBold</family>
+      <pointsize>14</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton#connectButton {
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 203, 241, 255), stop:0.14 rgba(255, 203, 241, 255), stop:0.15 rgba(255, 203, 241, 255), stop:0.17 rgba(255, 203, 241, 255), stop:0.50 rgba(190, 247, 255, 255), stop:0.84 rgba(172, 126, 251, 255), stop:0.95 rgba(204, 152, 249, 255));
+
+    border: 1px solid rgb(221, 221, 221); /* 테두리 두께, 스타일, 색상 */
+    border-radius: 21px;
+}
+
+QPushButton#connectButton:disabled {
+   font-weight: bold;
+    color: rgb(255, 255, 255);
+      background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, 
+        stop:0 rgba(255, 203, 241, 100), 
+        stop:0.14 rgba(255, 203, 241, 100), 
+        stop:0.15 rgba(255, 203, 241, 100), 
+        stop:0.17 rgba(255, 203, 241, 100), 
+        stop:0.50 rgba(190, 247, 255, 100), 
+        stop:0.84 rgba(172, 126, 251, 100), 
+        stop:0.95 rgba(204, 152, 249, 100));
+
+ border: 1px solid rgba(221, 221, 221,100); /* 테두리 두께, 스타일, 색상 */
+    border-radius: 21px;
+}
+</string>
+    </property>
     <property name="text">
-     <string>connect</string>
+     <string>CONNECT</string>
     </property>
    </widget>
    <widget class="QLabel" name="status_label">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>180</y>
-      <width>281</width>
-      <height>20</height>
+      <x>170</x>
+      <y>30</y>
+      <width>171</width>
+      <height>51</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>나눔스퀘어라운드OTF ExtraBold</family>
+      <pointsize>23</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
     <property name="layoutDirection">
-     <enum>Qt::LeftToRight</enum>
+     <enum>Qt::LayoutDirection::LeftToRight</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+color: qlineargradient(x1:0, y1:0, x2:200, y2:0, stop:0.3 #ffcbf1, stop:0.45 #bef7ff, stop:1 #cc98f9);</string>
     </property>
     <property name="text">
-     <string>Welcome!</string>
+     <string>WELCOME !</string>
     </property>
    </widget>
    <widget class="QPushButton" name="LoginButton">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>180</y>
-      <width>89</width>
-      <height>25</height>
+      <x>160</x>
+      <y>490</y>
+      <width>191</width>
+      <height>51</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>나눔스퀘어라운드OTF ExtraBold</family>
+      <pointsize>14</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton#LoginButton{
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 203, 241, 255), stop:0.14 rgba(255, 203, 241, 255), stop:0.15 rgba(255, 203, 241, 255), stop:0.17 rgba(255, 203, 241, 255), stop:0.50 rgba(190, 247, 255, 255), stop:0.84 rgba(172, 126, 251, 255), stop:0.95 rgba(204, 152, 249, 255));
+
+    border: 1px solid rgb(221, 221, 221); /* 테두리 두께, 스타일, 색상 */
+    border-radius: 21px;
+}
+</string>
+    </property>
     <property name="text">
-     <string>Login</string>
+     <string>LOGIN</string>
     </property>
    </widget>
    <widget class="QPushButton" name="JoinButton">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>220</y>
-      <width>89</width>
-      <height>25</height>
+      <x>160</x>
+      <y>550</y>
+      <width>191</width>
+      <height>51</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>나눔스퀘어라운드OTF ExtraBold</family>
+      <pointsize>14</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton#JoinButton{
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 203, 241, 255), stop:0.14 rgba(255, 203, 241, 255), stop:0.15 rgba(255, 203, 241, 255), stop:0.17 rgba(255, 203, 241, 255), stop:0.50 rgba(190, 247, 255, 255), stop:0.84 rgba(172, 126, 251, 255), stop:0.95 rgba(204, 152, 249, 255));
+
+    border: 1px solid rgb(221, 221, 221); /* 테두리 두께, 스타일, 색상 */
+    border-radius: 21px;
+}
+</string>
+    </property>
     <property name="text">
-     <string>Join</string>
+     <string>JOIN</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>155</x>
+      <y>260</y>
+      <width>201</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>나눔스퀘어라운드OTF ExtraBold</family>
+      <pointsize>25</pointsize>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+
+color: qlineargradient(x1:0, y1:0, x2:200, y2:0, stop:0.3 #ffcbf1, stop:0.45 #bef7ff, stop:1 #cc98f9);</string>
+    </property>
+    <property name="text">
+     <string>VEDA CHAT</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>70</y>
+      <width>301</width>
+      <height>351</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 255,0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="resources_client.qrc">:/image/image/video_icon4.png</pixmap>
     </property>
    </widget>
   </widget>
@@ -83,8 +214,14 @@
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(236, 236, 236);</string>
+   </property>
+  </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources_client.qrc"/>
+ </resources>
  <connections/>
 </ui>

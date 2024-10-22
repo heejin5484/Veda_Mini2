@@ -2,7 +2,7 @@
 #include "ui_chatroom.h"
 #include "databasewindow.h"
 #include <QMenu>
-
+#include "rtpprocess.h"
 chatRoom::chatRoom(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::chatRoom)
@@ -13,14 +13,17 @@ chatRoom::chatRoom(QWidget *parent)
     connect(chatServer, &ChatServer::messageReceived, this, &chatRoom::onMessageReceived);
     qDebug() << "Signal connected!";
     connect(ui->userList, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showContextMenu(QPoint)));
+    connect(rtpProcess::instance(), &rtpProcess::newFrameAvailable, this, &chatRoom::onNewFrameAvailable);
 }
-
 
 chatRoom::~chatRoom()
 {
     delete ui;
 }
 
+void chatRoom::onNewFrameAvailable(const QImage& frame) {
+    ui->video_label->setPixmap(QPixmap::fromImage(frame));
+}
 
 void chatRoom::showContextMenu(const QPoint &pos) {
     QListWidgetItem *item = ui->userList->itemAt(pos);
@@ -73,7 +76,7 @@ void chatRoom::on_managerButton_clicked()
 void chatRoom::onMessageReceived(const QString &message)
 {
     qDebug() << "emit 수신한 메시지:" << message; // 디버깅 출력
-    ui->textEdit->append(message);
+    //ui->textEdit->append(message);
     //QMetaObject::invokeMethod(ui->textEdit, "append", Qt::QueuedConnection, Q_ARG(QString, message));
 }
 

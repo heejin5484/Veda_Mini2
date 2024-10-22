@@ -11,6 +11,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
+#include "rtpprocess.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -33,7 +34,16 @@ void MainWindow::on_Login_button_clicked()
 void MainWindow::LoginSuccess(){
     ServerOpen(SERVER_PORT);
     chatroom = new chatRoom(this);
+    // 크기 정책 설정
+    chatroom->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     setCentralWidget(chatroom);
+
+    // MainWindow의 최소 크기 설정 (chatroom의 크기 이하로 내려가지않도록
+    setMinimumSize(1057, 570);
+
+    // 싱글톤 객체를 통해 FFmpeg 멀티캐스트 스트리밍 시작
+    rtpProcess::instance()->startFFmpegProcess();
 
     connect(this, &MainWindow::NewUserAdd, chatroom, &chatRoom::addUserList);
     connect(this, &MainWindow::DisconnectUser, chatroom, &chatRoom::deleteUserList);
@@ -68,10 +78,7 @@ void MainWindow::DataIncome(QByteArray data, USER *user){
                 }
             }
         }
-
-
 }
-
 
 void MainWindow::UserDisconnected(USER *usr){
     if (UserMap.contains(usr->userid)){
@@ -85,4 +92,10 @@ void MainWindow::UserDisconnected(USER *usr){
     }
     delete usr;
     qDebug() << "User object deleted";
+}
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+    // FFmpeg 스트리밍 종료
+    rtpProcess::instance()->stopFFmpegProcess();
+    QMainWindow::closeEvent(event);
 }

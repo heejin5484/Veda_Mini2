@@ -5,7 +5,6 @@
 #include <QListWidget>
 #include <QTcpServer>
 #include "chatserver.h"
-
 class chatRoom;
 
 QT_BEGIN_NAMESPACE
@@ -22,7 +21,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     QTcpServer *server;
-
+    void closeEvent(QCloseEvent *event) override;
 
 public slots:
     void on_Login_button_clicked();
@@ -37,10 +36,8 @@ signals :
 private:
     Ui::MainWindow *ui;
     void LoginSuccess();
-    //ChatServer *server;
     chatRoom *chatroom;
     void ServerOpen(int address);
     QMap<QString, USER*> UserMap;
-
 };
 #endif // MAINWINDOW_H

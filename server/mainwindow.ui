@@ -10,43 +10,195 @@
     <height>542</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>436</width>
+    <height>542</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1057</width>
+    <height>542</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(255, 255, 255)
+</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="Login_button">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>390</y>
-      <width>81</width>
-      <height>71</height>
+      <x>300</x>
+      <y>360</y>
+      <width>101</width>
+      <height>101</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>나눔스퀘어라운드 ExtraBold</family>
+      <pointsize>11</pointsize>
+      <italic>false</italic>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgba(255, 203, 241, 255), stop:0.14 rgba(255, 203, 241, 255), stop:0.15 rgba(255, 203, 241, 255), stop:0.17 rgba(255, 203, 241, 255), stop:0.70 rgba(190, 247, 255, 255), stop:0.98 rgba(186, 221, 254,255), stop:1 rgba(204, 152, 249, 255));
+
+    border: 1px solid rgb(221, 221, 221); /* 테두리 두께, 스타일, 색상 */
+    border-radius: 50px;
+
+
+</string>
+    </property>
     <property name="text">
-     <string>Login</string>
+     <string>LOGIN</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="ID_line">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>390</y>
-      <width>241</width>
-      <height>26</height>
+      <x>40</x>
+      <y>365</y>
+      <width>251</width>
+      <height>41</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <kerning>true</kerning>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    padding: 10px;
+	color: rgb(89, 89, 89);
+    border-style: solid;
+    border: 1px solid rgb(203, 203, 203);
+    border-radius: 20px;
+    background-color: rgb(233, 233, 233);
+}
+
+QLineEdit::placeholder{
+	color: rgb(139, 139, 139);
+}</string>
+    </property>
+    <property name="text">
+     <string>USER ID</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="PW_line">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>430</y>
-      <width>241</width>
-      <height>26</height>
+      <x>40</x>
+      <y>420</y>
+      <width>251</width>
+      <height>41</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    padding: 10px;
+	color: rgb(89, 89, 89);
+    border-style: solid;
+    border: 1px solid rgb(203, 203, 203);
+    border-radius: 20px;
+    background-color: rgb(233, 233, 233);
+}
+
+QLineEdit::placeholder{
+	color: rgb(139, 139, 139);
+}</string>
+    </property>
+    <property name="text">
+     <string>USER PASSWORD</string>
+    </property>
    </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>40</y>
+      <width>261</width>
+      <height>261</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255,0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>:/images/images/video_icon4.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>180</y>
+      <width>271</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>나눔스퀘어OTF_ac ExtraBold</family>
+      <pointsize>20</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="mouseTracking">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+color: qlineargradient(x1:0, y1:0, x2:200, y2:0, stop:0.3 #ffcbf1, stop:0.45 #bef7ff, stop:1 #cc98f9);</string>
+    </property>
+    <property name="text">
+     <string>VEDA CHAT</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+   </widget>
+   <zorder>label</zorder>
+   <zorder>Login_button</zorder>
+   <zorder>ID_line</zorder>
+   <zorder>PW_line</zorder>
+   <zorder>label_2</zorder>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="maximumSize">
+    <size>
+     <width>16777212</width>
+     <height>16777215</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(236, 236, 236);</string>
+   </property>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -54,11 +206,16 @@
      <x>0</x>
      <y>0</y>
      <width>436</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(186, 186, 186);</string>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>true</bool>
+   </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>

@@ -21,6 +21,7 @@ public slots:
     void showContextMenu(const QPoint &pos);
     void addUserList(QString id);
     void deleteUserList(QString id);
+    void onNewFrameAvailable(const QImage& frame);
     void onMessageReceived(const QString &message);
 
 private slots:
