@@ -71,6 +71,8 @@ client/.qmake.stash
 client/client
 server/.qmake.stash
 server/server
+server/Server
+client/Client
 
 # 현재 디렉터리의 Makefile은 무시하지 않음
 !/Makefile
