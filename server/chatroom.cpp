@@ -76,7 +76,7 @@ void chatRoom::on_managerButton_clicked()
 void chatRoom::onMessageReceived(const QString &message)
 {
     qDebug() << "emit 수신한 메시지:" << message; // 디버깅 출력
-    ui->textEdit->append(message);
+    //ui->textEdit->append(message);
     //QMetaObject::invokeMethod(ui->textEdit, "append", Qt::QueuedConnection, Q_ARG(QString, message));
 }
 

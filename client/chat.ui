@@ -131,7 +131,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(124, 124, 124);</string>
+    <string notr="true">background-color: rgba(124, 124, 124,0);</string>
    </property>
    <property name="text">
     <string/>
@@ -196,12 +196,12 @@ background-color: rgba(255, 255, 255,255,0);</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>511</width>
-     <height>681</height>
+     <width>521</width>
+     <height>691</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(237, 237, 237);
+    <string notr="true">background-color: rgb(124, 124, 124);
 border-radius:
 20px;
 border-style:
@@ -217,7 +217,7 @@ rgb(188, 188, 188);
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="video_icon">
    <property name="geometry">
     <rect>
      <x>220</x>
@@ -310,11 +310,11 @@ color: rgb(177, 17, 17);</string>
    </property>
   </widget>
   <zorder>videolabel_background</zorder>
+  <zorder>video_icon</zorder>
   <zorder>video_label</zorder>
   <zorder>chatLog</zorder>
   <zorder>ppl_num</zorder>
   <zorder>pushButton_2</zorder>
-  <zorder>label</zorder>
   <zorder>label_2</zorder>
   <zorder>msgLine</zorder>
   <zorder>sendButton</zorder>
