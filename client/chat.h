@@ -2,6 +2,7 @@
 #define CHAT_H
 
 #include <QWidget>
+#include "networkmanager.h"
 
 namespace Ui {
 class chat;
@@ -12,11 +13,12 @@ class chat : public QWidget
     Q_OBJECT
 
 public:
-    explicit chat(QWidget *parent = nullptr);
+    explicit chat(NetworkManager *networkManager, QWidget *parent = nullptr);
     ~chat();
 
 private:
     Ui::chat *ui;
+    NetworkManager *networkManager;
 
 signals :
     void sendMsg_sig(const QString &msg);

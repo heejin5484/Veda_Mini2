@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include "ui_chat.h"
 #include "chat.h"
+#include "joinwindow.h"
+#include "loginwindow.h"
 #include <QTcpSocket>
 
 QT_BEGIN_NAMESPACE
@@ -11,6 +13,18 @@ namespace Ui {
 class MainWindow;
 }
 QT_END_NAMESPACE
+
+typedef struct user {
+    QString userid;
+    QString password;
+    QString name;
+    QTcpSocket *usersocket;
+} USER;
+
+struct CUser {
+    QString userid;
+    QString name;
+};
 
 class MainWindow : public QMainWindow
 {
@@ -21,8 +35,9 @@ public:
     ~MainWindow();
     QTcpSocket *clientSocket;
     QString id;
-
+    CUser currentUser;
     void sendMsg(QString msg);
+    void setConnectButtonEnabled(bool enabled);
 
 private slots:
 
@@ -30,9 +45,15 @@ private slots:
     void onConnected();
     void failedConnect();
     void readMsg();
+    void on_LoginButton_clicked();
 
 private:
+
+    void on_JoinButton_clicked();
     Ui::MainWindow *ui;
+    JoinWindow *joinWindow;
+    LoginWindow *loginWindow;
+    NetworkManager *networkManager;
     chat *ui_chat;
     void tryConnect(QString ip, int port);
 
