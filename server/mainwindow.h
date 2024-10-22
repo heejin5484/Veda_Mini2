@@ -26,13 +26,13 @@ public:
 public slots:
     void on_Login_button_clicked();
     void UserConnected(USER* usr);
-    void DataIncome(QString message);
+    void DataIncome(const QString id, const QString message);
     void UserDisconnected(USER *usr);
 
 signals :
     void NewUserAdd(QString id);
     void DisconnectUser(QString id);
-    void showMessageLog(QString msg);
+    void showMessageLog(const QString id,const QString msg);
 
 private:
     Ui::MainWindow *ui;

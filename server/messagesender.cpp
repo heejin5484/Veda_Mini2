@@ -1,3 +1,3 @@
 #include "messagesender.h"
 
-messageSender::messageSender() {}
+//messageSender::messageSender() {}

@@ -67,7 +67,7 @@ void MainWindow::UserConnected(USER* usr){
     emit NewUserAdd(usr->userid); //user add signal
 }
 
-void MainWindow::DataIncome(QString message){
+void MainWindow::DataIncome(const QString id, const QString message){
     /*qDebug() << "Data Incoming from user:" << user->userid;
 
         for (auto otherUser : UserMap) {
@@ -80,7 +80,7 @@ void MainWindow::DataIncome(QString message){
         }
     */
     qDebug() << "Data Incoming:" << message;
-    emit showMessageLog(message);
+    emit showMessageLog(id, message);
 
 }
 
@@ -92,7 +92,7 @@ void MainWindow::UserDisconnected(USER *usr){
     }
 
     if (usr->usersocket) {
-        delete usr->usersocket;  //
+        delete usr->usersocket;
     }
     delete usr;
     qDebug() << "User object deleted";

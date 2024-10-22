@@ -49,16 +49,26 @@ void ChatServer::incomingConnection(qintptr socketDescriptor) {
         });
 
         connect(clientSocket, &QTcpSocket::disconnected, [=]() {
+            qDebug() << clientMap.value(clientSocket, nullptr)->userid;
             qDebug() << "클라이언트 연결 해제: " << clientSocket->peerAddress().toString();
-            clientMap.remove(clientSocket);
+            USER* user = clientMap.value(clientSocket, nullptr);
+            if (user) {
+                // user가 유효할 경우 처리
+                qDebug() << "User found:" << user->userid; // 예: user 구조체 내에 id가 있을 경우
+               // emit DisconnectUser(user);
+               // clientMap.remove(clientSocket);
+            } else {
+                // clientSocket에 해당하는 사용자가 없을 경우 처리
+                qDebug() << "User not found for the given clientSocket.";
+            }
 
             if (thread->isRunning()) {
                 thread->quit();
-                thread->wait();
             }
             threadList.removeOne(thread);
             thread->deleteLater();
             qDebug() << "클라이언트 연결 해제 및 스레드 종료";
+
         });
     });
 
@@ -150,6 +160,7 @@ void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *cli
             emit AddUser(user);
             qDebug() << "서버에 추가된 사용자: " << user->userid;
             sendResponse(clientSocket, responseJson);
+            clientMap.insert(clientSocket, user);
         } else {
             sendResponse(clientSocket, "fail", "비밀번호가 틀렸습니다.");
         }
@@ -165,7 +176,8 @@ void ChatServer::processMessageRequest(const QJsonObject &jsonObj, QTcpSocket *c
     QString userid = jsonObj["userid"].toString();
     QString name = jsonObj["name"].toString();
     qDebug() << "메시지 수신: " << message << " 사용자 ID: " << userid;
-    emit messageReceived(userid + ": " + message); // 메시지 방출
+    qDebug() << clientMap.value(clientSocket,nullptr)->userid;
+    emit messageReceived(userid, message); // 메시지 방출
     qDebug() << "signal Message received:" << message;
     // DatabaseManager 인스턴스 생성 시 유저와 채팅 DB를 모두 전달
     DatabaseManager dbManager("users.db", "chats.db");

@@ -22,7 +22,7 @@ public slots:
     void addUserList(QString id);
     void deleteUserList(QString id);
     void onNewFrameAvailable(const QImage& frame);
-    void onMessageReceived(const QString &message);
+    void onMessageReceived(const QString id, const QString &message);
 
 private slots:
     void on_managerButton_clicked();

@@ -46,7 +46,7 @@ protected:
 signals:
     void AddUser(USER *user);       // 사용자 추가 시 발생하는 시그널
     void DisconnectUser(USER *user); // 사용자 연결 해제 시 발생하는 시그널
-    void messageReceived(const QString &message);
+    void messageReceived(const QString &id, const QString &message);
 
 private:
     MainWindow *mainwindow;
