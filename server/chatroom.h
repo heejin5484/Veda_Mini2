@@ -16,6 +16,8 @@ public:
     explicit chatRoom(QWidget *parent = nullptr);
     ~chatRoom();
 
+signals:
+    void sendMessageToServer(const QByteArray &data);
 
 public slots:
     void showContextMenu(const QPoint &pos);
@@ -23,9 +25,12 @@ public slots:
     void deleteUserList(QString id);
     void onNewFrameAvailable(const QImage& frame);
     void onMessageReceived(const QString &message);
+    void on_chatButton_clicked();
 
 private slots:
     void on_managerButton_clicked();
+
+
 
 private:
     Ui::chatRoom *ui;

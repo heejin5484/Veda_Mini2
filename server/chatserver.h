@@ -34,6 +34,9 @@ class ChatServer : public QTcpServer
 public:
     explicit ChatServer(QObject *parent = nullptr);
 
+public slots:
+    void sendMessageToClients(const QByteArray &data);
+
 protected:
     void incomingConnection(qintptr socketDescriptor) override;
 

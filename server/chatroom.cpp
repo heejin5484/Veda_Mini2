@@ -2,7 +2,11 @@
 #include "ui_chatroom.h"
 #include "databasewindow.h"
 #include <QMenu>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 #include "rtpprocess.h"
+
 chatRoom::chatRoom(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::chatRoom)
@@ -10,6 +14,9 @@ chatRoom::chatRoom(QWidget *parent)
     ui->setupUi(this);
     ui->userList->setContextMenuPolicy(Qt::CustomContextMenu);
     chatServer = new ChatServer(this);
+
+    connect(this, &chatRoom::sendMessageToServer, chatServer, &ChatServer::sendMessageToClients);
+
     connect(chatServer, &ChatServer::messageReceived, this, &chatRoom::onMessageReceived);
     qDebug() << "Signal connected!";
     connect(ui->userList, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showContextMenu(QPoint)));
@@ -79,6 +86,28 @@ void chatRoom::onMessageReceived(const QString &message)
     //ui->textEdit->append(message);
     //QMetaObject::invokeMethod(ui->textEdit, "append", Qt::QueuedConnection, Q_ARG(QString, message));
 }
+
+
+void chatRoom::on_chatButton_clicked()
+{
+    QString message = ui->lineEdit_chat->text();
+
+    if (!message.isEmpty()) {
+        qDebug() << "Sending message to server: " << message;
+
+        QJsonObject json;
+        json["type"] = "S";
+        json["message"] = message;
+        json["userid"] = "server";
+
+        QJsonDocument jsonDoc(json);
+        QByteArray data = jsonDoc.toJson(QJsonDocument::Compact);
+        emit sendMessageToServer(data);
+
+        ui->lineEdit_chat->clear();
+    }
+}
+
 
 
 

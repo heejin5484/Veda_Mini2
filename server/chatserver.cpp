@@ -16,9 +16,8 @@ ChatServer::ChatServer(QObject *parent)
 }
 
 void ChatServer::incomingConnection(qintptr socketDescriptor) {
-    QTcpSocket *clientSocket = new QTcpSocket;
+    QTcpSocket *clientSocket = new QTcpSocket(this);
     clientSocket->setSocketDescriptor(socketDescriptor);
-
     QThread *thread = new QThread;
     clientSocket->moveToThread(thread);
 
@@ -202,3 +201,14 @@ void ChatServer::sendResponse(QTcpSocket *clientSocket, const QJsonObject &respo
     clientSocket->write(responseData + "\n"); // 개행 문자 추가
     clientSocket->flush();  // 데이터 전송 완료를 보장
 }
+
+void ChatServer::sendMessageToClients(const QByteArray &data)
+{
+    // 모든 클라이언트에게 메시지 전송
+    for (QTcpSocket* clientSocket : clientMap.keys()) {
+            clientSocket->write(data);
+            clientSocket->flush();
+        }
+    qDebug() << "Message sent to all clients: " << data;
+}
+
