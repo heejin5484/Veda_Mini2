@@ -1,5 +1,6 @@
 #include "rtpprocess.h"
 #include <QDir>
+#include <QImage>
 
 rtpProcess* rtpProcess::instance() {
     static rtpProcess instance;
