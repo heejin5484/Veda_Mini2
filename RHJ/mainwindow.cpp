@@ -3,6 +3,7 @@
 #include "logwindow.h"
 #include "logviewer.h"
 #include "thread.h"
+#include "loginwindow.h"
 #include <QDebug>
 #include <QDateTime>
 #include <QQueue>
@@ -17,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     thread = new Thread(nullptr);
+    connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::on_startButton_clicked);
+
 
     // dbManager init
     dbManager = new databaseManager("logs.db");
@@ -25,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     // slot connect
-    connect(ui->logDataButton, &QPushButton::clicked, this, &MainWindow::on_LogData_clicked);
+    //connect(ui->logDataButton, &QPushButton::clicked, this, &MainWindow::on_LogData_clicked);
     connect(thread, SIGNAL(alert()), SLOT(queueUpdate()));
 
 
@@ -34,9 +37,11 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    thread->quit(); // 스레드 종료
+    thread->wait();
     delete ui;
     delete dbManager;
-    thread->terminate();
+    //thread->terminate();
 }
 
 void MainWindow::on_sendButton_clicked()
@@ -125,3 +130,11 @@ void MainWindow::on_idButton_3_clicked()
     //ui->idLabel->setText("id3");
 }
 
+
+void MainWindow::on_startButton_clicked()
+{
+    NetworkManager *networkManager = new NetworkManager;
+    loginWindow *loginWindowInstance = new loginWindow(networkManager, this);  // 변수 이름을 loginWindowInstance로 변경
+    loginWindowInstance->show();
+    this->hide();
+}
