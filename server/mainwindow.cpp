@@ -47,7 +47,7 @@ void MainWindow::LoginSuccess(){
 
     connect(this, &MainWindow::NewUserAdd, chatroom, &chatRoom::addUserList);
     connect(this, &MainWindow::DisconnectUser, chatroom, &chatRoom::deleteUserList);
-    //connect(server,&ChatServer::messageReceived, chatroom, &chatRoom::onMessageReceived);
+    connect(this,&MainWindow::showMessageLog, chatroom, &chatRoom::onMessageReceived);
 }
 
 void MainWindow::ServerOpen(int address) {
@@ -67,8 +67,8 @@ void MainWindow::UserConnected(USER* usr){
     emit NewUserAdd(usr->userid); //user add signal
 }
 
-void MainWindow::DataIncome(QByteArray data, USER *user){
-    qDebug() << "Data Incoming from user:" << user->userid;
+void MainWindow::DataIncome(QString message){
+    /*qDebug() << "Data Incoming from user:" << user->userid;
 
         for (auto otherUser : UserMap) {
             if (otherUser != user) {
@@ -78,6 +78,10 @@ void MainWindow::DataIncome(QByteArray data, USER *user){
                 }
             }
         }
+    */
+    qDebug() << "Data Incoming:" << message;
+    emit showMessageLog(message);
+
 }
 
 void MainWindow::UserDisconnected(USER *usr){

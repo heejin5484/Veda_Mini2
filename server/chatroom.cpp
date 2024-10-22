@@ -9,8 +9,8 @@ chatRoom::chatRoom(QWidget *parent)
 {
     ui->setupUi(this);
     ui->userList->setContextMenuPolicy(Qt::CustomContextMenu);
-    chatServer = new ChatServer(this);
-    connect(chatServer, &ChatServer::messageReceived, this, &chatRoom::onMessageReceived);
+    //chatServer = new ChatServer(this);
+    //connect(chatServer, &ChatServer::messageReceived, this, &chatRoom::onMessageReceived);
     qDebug() << "Signal connected!";
     connect(ui->userList, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showContextMenu(QPoint)));
     connect(rtpProcess::instance(), &rtpProcess::newFrameAvailable, this, &chatRoom::onNewFrameAvailable);
@@ -73,12 +73,26 @@ void chatRoom::on_managerButton_clicked()
     dbWindow->exec();
 }
 
+QString formatMessage(const QString& userId, const QString& message) {
+    // userId를 파란색으로, 메시지를 검정색으로 서식 지정
+    QString formattedMessage = QString("<b><font color='blue'>%1</font></b>: <font color='black'>%2</font><br>")
+                                   .arg(userId, message);
+    return formattedMessage;
+}
+
+QString formatMessage(const QString& userId, const QString& message, const QString& userColor) {
+    // userId와 message의 색상을 인자로 받아서 포맷
+    QString formattedMessage = QString("<b><font color='%1'>%2</font></b>: <font color='black'>%3</font><br>")
+                                   .arg(userColor, userId, message);
+    return formattedMessage;
+}
+
 void chatRoom::onMessageReceived(const QString &message)
 {
     qDebug() << "emit 수신한 메시지:" << message; // 디버깅 출력
-    //ui->textEdit->append(message);
-    //QMetaObject::invokeMethod(ui->textEdit, "append", Qt::QueuedConnection, Q_ARG(QString, message));
+    QString msg = formatMessage("heejin", message, "red");
+    // 수신된 HTML 메시지를 QTextEdit에 출력
+    ui->chatLog->insertHtml(msg);
+    ui->chatLog->moveCursor(QTextCursor::End); // 새로운 메시지가 올 때마다 끝으로 스크롤
 }
-
-
 

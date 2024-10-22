@@ -13,6 +13,7 @@ ChatServer::ChatServer(QObject *parent)
     mainwindow = static_cast<MainWindow*>(parent);
     connect(this, &ChatServer::AddUser, mainwindow, &MainWindow::UserConnected, Qt::UniqueConnection);
     connect(this, &ChatServer::DisconnectUser, mainwindow, &MainWindow::UserDisconnected);
+    connect(this, &ChatServer::messageReceived, mainwindow, &MainWindow::DataIncome);
 }
 
 void ChatServer::incomingConnection(qintptr socketDescriptor) {
