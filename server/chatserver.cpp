@@ -7,73 +7,76 @@
 #include <QDir>
 #include <QSqlQuery>
 #include <QSqlError>
+#include "messagesender.h"
 
 ChatServer::ChatServer(QObject *parent)
     : QTcpServer(parent), mainwindow(nullptr) {
-    mainwindow = static_cast<MainWindow*>(parent);
+    /*mainwindow = static_cast<MainWindow*>(parent);
     connect(this, &ChatServer::AddUser, mainwindow, &MainWindow::UserConnected, Qt::UniqueConnection);
     connect(this, &ChatServer::DisconnectUser, mainwindow, &MainWindow::UserDisconnected);
     connect(this, &ChatServer::messageReceived, mainwindow, &MainWindow::DataIncome);
+*/
+}
+void ChatServer::setMainWindow(MainWindow* window)
+{
+    mainwindow = window;
+
+    // MainWindow가 설정된 후에 연결을 설정합니다.
+    if (mainwindow != nullptr) {
+        connect(this, &ChatServer::AddUser, mainwindow, &MainWindow::UserConnected, Qt::UniqueConnection);
+        connect(this, &ChatServer::DisconnectUser, mainwindow, &MainWindow::UserDisconnected);
+        connect(this, &ChatServer::messageReceived, mainwindow, &MainWindow::DataIncome);
+    } else {
+        qDebug() << "MainWindow is nullptr, connections not made.";
+    }
+    qDebug() << "Current thread: " << QThread::currentThread();
 }
 
 void ChatServer::incomingConnection(qintptr socketDescriptor) {
+
     QTcpSocket *clientSocket = new QTcpSocket;
-    clientSocket->setSocketDescriptor(socketDescriptor);
+    if (!clientSocket->setSocketDescriptor(socketDescriptor)) {
+        qDebug() << "Error: Could not set socket descriptor";
+        delete clientSocket;
+        return;
+    }
 
-    QThread *thread = new QThread;
-    clientSocket->moveToThread(thread);
+    connect(clientSocket, &QTcpSocket::readyRead, [=]() {
+        QByteArray data = clientSocket->readAll();
+        qDebug() << "수신한 사용자 데이터:" << data;
 
-    threadList.append(thread); // 스레드 목록에 추가
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
+        QJsonObject jsonObj = jsonDoc.object();
 
-    connect(thread, &QThread::started, [this, clientSocket, thread]() {
-        qDebug() << "새 스레드에서 클라이언트 연결됨";
+        QString type = jsonObj["type"].toString(); // 요청 유형 확인
 
-        connect(clientSocket, &QTcpSocket::readyRead, [=]() {
-            QByteArray data = clientSocket->readAll();
-            qDebug() << "수신한 사용자 데이터:" << data;
-
-            QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
-            QJsonObject jsonObj = jsonDoc.object();
-
-            QString type = jsonObj["type"].toString(); // 요청 유형 확인
-
-            if (type == "J") {
-                processSignupRequest(jsonObj, clientSocket); // 가입 요청 처리
-            } else if (type == "L") {
-                processLoginRequest(jsonObj, clientSocket); // 로그인 요청 처리
-            } else if (type == "M") {
-                processMessageRequest(jsonObj, clientSocket); // 메시지 요청 처리
-            } else {
-                sendResponse(clientSocket, "error", "잘못된 요청 유형입니다.");
-            }
-        });
-
-        connect(clientSocket, &QTcpSocket::disconnected, [=]() {
-            qDebug() << clientMap.value(clientSocket, nullptr)->userid;
-            qDebug() << "클라이언트 연결 해제: " << clientSocket->peerAddress().toString();
-            USER* user = clientMap.value(clientSocket, nullptr);
-            if (user) {
-                // user가 유효할 경우 처리
-                qDebug() << "User found:" << user->userid; // 예: user 구조체 내에 id가 있을 경우
-               // emit DisconnectUser(user);
-               // clientMap.remove(clientSocket);
-            } else {
-                // clientSocket에 해당하는 사용자가 없을 경우 처리
-                qDebug() << "User not found for the given clientSocket.";
-            }
-
-            if (thread->isRunning()) {
-                thread->quit();
-            }
-            threadList.removeOne(thread);
-            thread->deleteLater();
-            qDebug() << "클라이언트 연결 해제 및 스레드 종료";
-
-        });
+        if (type == "J") {
+            processSignupRequest(jsonObj, clientSocket); // 가입 요청 처리
+        } else if (type == "L") {
+            processLoginRequest(jsonObj, clientSocket); // 로그인 요청 처리
+        } //else if (type == "M") {
+            //processMessageRequest(jsonObj, clientSocket); // 메시지 요청 처리}
+        else {
+            sendResponse(clientSocket, "error", "잘못된 요청 유형입니다.");
+            clientSocket->disconnectFromHost();
+        }
     });
 
-    thread->start();
-    qDebug() << "스레드 초기화";
+    // 클라이언트가 연결을 끊을 때 처리
+    connect(clientSocket, &QTcpSocket::disconnected, [=]() {
+        qDebug() << "클라이언트 연결 해제: " << clientSocket->peerAddress().toString();
+        /*USER* user = clientMap.value(clientSocket, nullptr);
+        if (user) {
+            qDebug() << "User found:" << user->userid;
+            emit DisconnectUser(user);
+            clientMap.remove(clientSocket);
+        } else {
+            // clientSocket에 해당하는 사용자가 없을 경우 처리
+            qDebug() << "User not found for the given clientSocket.";
+        }
+        clientSocket->deleteLater();
+        */
+    });
 }
 
 void ChatServer::processSignupRequest(const QJsonObject &jsonObj, QTcpSocket *clientSocket) {
@@ -84,12 +87,6 @@ void ChatServer::processSignupRequest(const QJsonObject &jsonObj, QTcpSocket *cl
     QString email = jsonObj["email"].toString();
 
     if (!userid.isEmpty()) {
-        USER *user = new USER;
-        user->userid = userid;
-        user->password = password;
-        user->name = name;
-        user->usersocket = clientSocket;
-
         // DatabaseManager 인스턴스 생성 시 유저와 채팅 DB를 모두 전달
         DatabaseManager dbManager("users.db", "chats.db");
         if (!dbManager.init()) {
@@ -107,12 +104,14 @@ void ChatServer::processSignupRequest(const QJsonObject &jsonObj, QTcpSocket *cl
         }
 
         dbManager.close();
-        delete user;
+        //delete user;
 
     } else {
         qDebug() << "잘못된 사용자 ID 수신";
         clientSocket->disconnectFromHost();
     }
+    // 회원가입 성공 후 재로그인 요청
+    clientSocket->disconnectFromHost();
 }
 
 void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *clientSocket) {
@@ -135,6 +134,7 @@ void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *cli
     if (!query.exec()) {
         qDebug() << "쿼리 실행 오류:" << query.lastError().text();
         sendResponse(clientSocket, "error", "쿼리 실행 오류.");
+        clientSocket->disconnectFromHost();
         return;
     }
 
@@ -145,11 +145,20 @@ void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *cli
         qDebug() << "저장된 비밀번호:" << storedPassword;
 
         if (storedPassword == password) {
+            // 로그인 성공 시 messageSender 생성
             USER *user = new USER;
             user->userid = userid;
             user->password = password;
             user->name = storedName;
             user->usersocket = clientSocket;
+
+            // 스레드 생성
+            QThread* thread = new QThread;
+            // messageSender 생성 및 추가
+            messageSender* sender = new messageSender();
+            sender->moveToThread(thread);
+            senderList.insert(sender, user);
+            clientSocket->moveToThread(thread);
 
             QJsonObject responseJson;
             responseJson["status"] = "success";
@@ -157,20 +166,23 @@ void ChatServer::processLoginRequest(const QJsonObject &jsonObj, QTcpSocket *cli
             responseJson["userid"] = user->userid;
             responseJson["name"] = user->name;
             responseJson["password"] = user->password;
-            emit AddUser(user);
             qDebug() << "서버에 추가된 사용자: " << user->userid;
             sendResponse(clientSocket, responseJson);
-            clientMap.insert(clientSocket, user);
+            emit AddUser(user);
         } else {
             sendResponse(clientSocket, "fail", "비밀번호가 틀렸습니다.");
+            clientSocket->disconnectFromHost();
         }
     } else {
         sendResponse(clientSocket, "error", "가입되지 않은 사용자입니다.");
+        clientSocket->disconnectFromHost();
     }
 
     dbManager.close();
 }
 
+
+/*
 void ChatServer::processMessageRequest(const QJsonObject &jsonObj, QTcpSocket *clientSocket) {
     QString message = jsonObj["message"].toString();
     QString userid = jsonObj["userid"].toString();
@@ -195,7 +207,7 @@ void ChatServer::processMessageRequest(const QJsonObject &jsonObj, QTcpSocket *c
 
     dbManager.close();
 }
-
+*/
 
 void ChatServer::sendResponse(QTcpSocket *clientSocket, const QString &status, const QString &message) const {
     QJsonObject responseJson;

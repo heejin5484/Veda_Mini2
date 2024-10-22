@@ -51,9 +51,12 @@ void MainWindow::LoginSuccess(){
 }
 
 void MainWindow::ServerOpen(int address) {
-    server = new ChatServer(this);
+    ChatServer& server = ChatServer::instance();
 
-    if (!server->listen(QHostAddress::Any, address)){
+    // MainWindow를 ChatServer에 전달
+    server.setMainWindow(this);
+
+    if (!server.listen(QHostAddress::Any, address)){
         qDebug() << "Server could not start!";
     }
     qDebug() << address << "Opened";
@@ -63,7 +66,7 @@ void MainWindow::ServerOpen(int address) {
 void MainWindow::UserConnected(USER* usr){
     qDebug() << "User connected";
     UserMap.insert(usr->userid, usr);
-    qDebug() << "Current users in UserMap:" << UserMap.keys(); // 현재 사용자의 ID 로그
+    //qDebug() << "Current users in UserMap:" << UserMap.keys(); // 현재 사용자의 ID 로그
     emit NewUserAdd(usr->userid); //user add signal
 }
 
@@ -90,11 +93,6 @@ void MainWindow::UserDisconnected(USER *usr){
         qDebug() << "User removed from UserMap: " << usr->userid;
         emit DisconnectUser(usr->userid);
     }
-
-    if (usr->usersocket) {
-        delete usr->usersocket;
-    }
-    delete usr;
     qDebug() << "User object deleted";
 }
 
