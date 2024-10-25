@@ -17,7 +17,7 @@ SOURCES += \
     databasewindow.cpp \
     main.cpp \
     mainwindow.cpp \
-    messagesender.cpp \
+    #messagesender.cpp \
     rtpprocess.cpp \
     databasemanager.cpp
 
@@ -27,7 +27,7 @@ HEADERS += \
     constants.h \
     databasewindow.h \
     mainwindow.h \
-    messagesender.h \
+    #messagesender.h \
     rtpprocess.h \
     databasemanager.h
 

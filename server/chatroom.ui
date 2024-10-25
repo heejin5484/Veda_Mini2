@@ -76,24 +76,6 @@ QListWidget::item:selected {
    <property name="viewMode">
     <enum>QListView::ViewMode::ListMode</enum>
    </property>
-   <item>
-    <property name="text">
-     <string>user1</string>
-    </property>
-    <property name="icon">
-     <iconset resource="resources.qrc">
-      <normaloff>:/images/images/ppl_icon3.png</normaloff>:/images/images/ppl_icon3.png</iconset>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>user2</string>
-    </property>
-    <property name="icon">
-     <iconset resource="resources.qrc">
-      <normaloff>:/images/images/ppl_icon3.png</normaloff>:/images/images/ppl_icon3.png</iconset>
-    </property>
-   </item>
   </widget>
   <widget class="QTextEdit" name="chatLog">
    <property name="enabled">
